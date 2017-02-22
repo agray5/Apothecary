@@ -1,0 +1,2 @@
+Bugs:
+If the same item is dropped and we take one of them, the other disappears and only back is displayed. If we go back the other is there.
