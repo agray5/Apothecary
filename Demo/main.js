@@ -24,12 +24,12 @@
 		    if (value == null) {
 		        value = 0;
 		    }
-		}
-		const Room = (name, bkg, initDesc, morningDesc, noonDesc, eveningDesc, nightDesc,  isOutside, npcs, takeableItems, examinableItems) => {
-			hasSeen = false;
-		    savedText = [];
+		};
+		var Room = function(name, bkg, initDesc, exits, morningDesc, noonDesc, eveningDesc, nightDesc,  isOutside, npcs, takeableItems, examinableItems) {
+			this.hasSeen = false;
+		    this.savedText = [];
 			this.bkg = bkg;
-		    exits = [];
+		    this.exits = exits;
 		    this.name = name;
 			this.initDesc = initDesc;
 		    this.morningDesc = morningDesc;
@@ -52,10 +52,13 @@
 		    if (isOutside == null) {
 		        this.isOutside = false;
 		    }
+			
+			const addExits = (exits) => {
+				this.exits = exits;
+			}
 		}
-		const addExits = (exits) => {
-		    this.exits = exits;
-		}
+		
+
 		
 		const Exit = (dir, nextRoom, exitMsg) => {
 		    this.dir = dir;
@@ -113,12 +116,12 @@
 		const addText = (text) => {
 		    $(".textBox").append('<p>' + text + '</p>');
 		};
-		const flushTextBox = => {
+		const flushTextBox = () => {
 		    $("ul.exit").empty();
 		    $(".textBox").empty();
 		    $(".action ul").empty();
 		};
-		const addExits = (exits) => {
+		const addExitsText = (exits) => {
 		    for (let e of exits) {
 		        $("ul.exit").append('<li id="' + e.dir + '"><a href="#">' + e.dir + '</li>');
 		    }
@@ -130,7 +133,7 @@
 		        $(str).remove();
 		    }
 		};
-		const addActionsBasedOnCurrRoom = => {
+		const addActionsBasedOnCurrRoom = () => {
 			if(!talking){
 				if (typeof currentRoom.npcs != "undefined" && currentRoom.npcs !== null && currentRoom.npcs.length > 0) {
 					$(".action ul").append('<li id="talk"><a href="#">Talk To</li>');
@@ -145,16 +148,16 @@
 				if (currentRoom == ingredientshop) 
 					$(".action ul").append('<li id="shop"><a href="#">Shop</li>');
 			}
-			else{
-			}
 		};
 		
 		const addAction = (id, name) => {
 			$(".action ul").append('<li id="'+id+'"><a href="#">'+name+'</li>');
-		}
-		constant removeAction = function(id) => {
+		};
+		
+		const removeAction = (id) => {
 			$(".action #"+id).remove();
-		}
+		};
+		
 		const displayItemsInRoom = () => {
 		    if (currentRoom.takeableItems != null && currentRoom.takeableItems.length > 0) {
 		        for (let i of currentRoom.takeableItems) {
@@ -209,7 +212,7 @@
 				}
 			}		
 		    displayItemsInRoom();
-		    addExits(currentRoom.exits);
+		    addExitsText(currentRoom.exits);
 		    addActionsBasedOnCurrRoom();
 		};
 		//used if we only want to refersh actions
@@ -298,7 +301,7 @@
 		    }
 		    let str = "#" + item.id + ".inTextBox";
 		    $(str).remove();
-		    let str = "#" + item.id + ".takeable";
+		    str = "#" + item.id + ".takeable";
 		    $(str).remove();
 		};
 		const getInvLinks = (id) => {
@@ -860,39 +863,39 @@
 		}
 		/********** Objects ***********/
 		/* items */
-		let key = new Item("key", 1, "An old key.", "A small glinting object lays on the ground.", 2, "ing", null, null, true, true);
-		let comb = new Item("comb", 2, "Without this you'd always have a bad hairday.", "A small comb lays on the ground", 4, "none", null,  null, true, true);
-		let brownShirt = new Item("brown shirt", 3, "A floofy brown shirt", "A brown fluffy item lies scrunched up on the ground.", 10, "equip", "shirt","img/shirtBrown.png", true, true);
-		let blueSkirt= new Item("blue skirt", 4, "A short blue skirt.", "A blue fluffy item lies scrunched up on the ground.", 15, "equip", "skirt","img/skirtBlue.png", true, true);
+		let key = Item("key", 1, "An old key.", "A small glinting object lays on the ground.", 2, "ing", null, null, true, true);
+		let comb = Item("comb", 2, "Without this you'd always have a bad hairday.", "A small comb lays on the ground", 4, "none", null,  null, true, true);
+		let brownShirt = Item("brown shirt", 3, "A floofy brown shirt", "A brown fluffy item lies scrunched up on the ground.", 10, "equip", "shirt","img/shirtBrown.png", true, true);
+		let blueSkirt = Item("blue skirt", 4, "A short blue skirt.", "A blue fluffy item lies scrunched up on the ground.", 15, "equip", "skirt","img/skirtBlue.png", true, true);
 		/* rooms */
 		//west wing rooms
-		let bedRoom = new Room("Bedroom", "img/bedroom.png", "Your new mentor gives you a gentle smile as she turns to leave you to get settled in your new room. Suddenly exhausted you take a seat on your bed. "
+		let bedRoom = Room("Bedroom", "img/bedroom.png", "Your new mentor gives you a gentle smile as she turns to leave you to get settled in your new room. Suddenly exhausted you take a seat on your bed. "
 			+"Waves of tension flow down your body. Sure you had known a lot would be expected out of you, working at the royal castle, but you hadn't expected to already be in charge of so much. Your right hand idly plays with your "
 			+"bed coverings, fingers slowly kneading into them like a kitten searching for milk. This was life, the royality owned the commoners. They could only hope that their ruler's guidance lead to prosperity. You look around your room with a sigh. "
 			+"Its true that its no smaller than what you use to back home, you did after all share a room of simular size with your sister, but its feels empty and lonely. "
 			+"The bed is covered in a plain spread with white sheets and a brown thin looking blanket. Your new desk is unadorned, just waiting to be covered in knick nacks and work forms. You spend the rest of the day unpacking your megar belongings and end the day with "
 			+"with a bath in your private wooden wash basin in the corner of the room. You apperciate the plain dividor hiding you from the view of the door.",
-		"Your bedroom is on the small side but at least its been furnished with a desk and a bed along the east wall. In the opposite corner a plain dividor hides a wooden wash basin. A door to the north leads out into the hallway.");
-		let hallway = new Room("Hallway",  "img/hallway.jpg", null, "A narrow hallway lined with doors");
-		let closet = new Room("Closet",  "img/closet.jpg", null, "A walk in closet with plenty of room tp hang up clothes. The door out is to the northEast.");
+		"Your bedroom is on the small side but at least its been furnished with a desk and a bed along the east wall. In the opposite corner a plain dividor hides a wooden wash basin. A door to the north leads out into the hallway.", [Exit(N, hallway), Exit(NW, closet)]);
+		let hallway = Room("Hallway",  "img/hallway.jpg", null, "A narrow hallway lined with doors", [Exit("Bedroom", bedRoom), Exit(E, platform)]);
+		let closet = Room("Closet",  "img/closet.jpg", null, "A walk in closet with plenty of room tp hang up clothes. The door out is to the northEast.", [Exit(NE, bedRoom)]);
 		//east wing rooms
 		//lobby rooms
-		let platform = new Room("Platform", "img/platform.jpg", null, "You stand on a  platform overlooking the first floor of the castle. To the west there is the door leading to the west wing and to the east is the door to the east wing. Below you are stairs going down.");
-		let lobby = new Room("Lobby", "img/lobby.jpg", null, "This room could easily fit hundered people all scurring to complete one task or another. It was rare to see any royalty come this way as this is considered to be an extension of the castle workers living quarters. " +
+		let platform = Room("Platform", "img/platform.jpg", null, "You stand on a  platform overlooking the first floor of the castle. To the west there is the door leading to the west wing and to the east is the door to the east wing. Below you are stairs going down.", [Exit(W, hallway), Exit("Down", lobby, "You walk down the stairway and into the lobby.")]));
+		let lobby = Room("Lobby", "img/lobby.jpg", null, "This room could easily fit hundered people all scurring to complete one task or another. It was rare to see any royalty come this way as this is considered to be an extension of the castle workers living quarters. " +
 		    " It would be hard to complain though. Rays of sunlight stream through the high widows and sometimes small birds would fly in, chirping a merry song. The smell of freshly made food could be smelt from the nearby kitchen.", null, null, "This room could easily fit hundered people all scurring to complete one task or another. It was rare to see any royalty come this way as this is considered to be an extension of the castle workers living quarters. " +
-		    " It would be hard to complain though. The hall looked breathtaking at night. Streams of cool moonlight filter in through the widows, while colorful laterns have been lit along the walls bathing the hall in a myriad of colors.");
-		let shop = new Room("Your Shop",  "img/shop.png", null, "A sparse shop with cabinets lined agianst the back wall holding your products. In front of the cabinets is a bar with comfy looking stools for patrons to sit at. Going through the employees only door will lead into the inner bar area while the door to the east leads out. ");
-		let ingredientshop = new Room("Ingredient Shop",  "img/ingShop.jpg", null, "A sparse shop with cabinets lined agianst the back wall holding your products. In front of the cabinets is a bar with comfy looking stools for patrons to sit at.");
+		    " It would be hard to complain though. The hall looked breathtaking at night. Streams of cool moonlight filter in through the widows, while colorful laterns have been lit along the walls bathing the hall in a myriad of colors.", 
+			[Exit("Up", platform, "You walk up the staircase and onto the platform."), Exit(shop.name, shop), Exit("Ingredient Shop", ingredientshop)]);
+		let shop = Room("Your Shop",  "img/shop.png", null, "A sparse shop with cabinets lined agianst the back wall holding your products. In front of the cabinets is a bar with comfy looking stools for patrons to sit at. Going through the employees only door will lead into the inner bar area while the door to the east leads out. ",
+			[Exit("Employees Only Door", null), Exit("Out", lobby)]);
+		let ingredientshop = Room("Ingredient Shop",  "img/ingShop.jpg", null, "A sparse shop with cabinets lined agianst the back wall holding your products. In front of the cabinets is a bar with comfy looking stools for patrons to sit at.", [Exit("Out", lobby) ]);
 		/* exits */
-		bedRoom.addExits([new Exit(N, hallway), new Exit(NW, closet)]);
-		hallway.addExits([new Exit("Bedroom", bedRoom), new Exit(E, platform)]);
-		closet.addExits([new Exit(NE, bedRoom)]);
-		platform.addExits([new Exit(W, hallway), new Exit("Down", lobby, "You walk down the stairway and into the lobby.")]);
-		lobby.addExits([new Exit("Up", platform, "You walk up the staircase and onto the platform."), new Exit(shop.name, shop), new Exit("Ingredient Shop", ingredientshop)]);
-		lobby.addExits([new Exit("Up", platform, "You walk up the staircase and onto the platform."), new Exit(shop.name, shop), new Exit("Ingredient Shop", ingredientshop)]);
-		shop.addExits([new Exit("Employees Only Door", null), new Exit("Out", lobby)]);
-		ingredientshop.addExits([ new Exit("Out", lobby) ])
-		
+		//bedRoom.addExits);
+		//hallway.addExits([Exit("Bedroom", bedRoom), Exit(E, platform)]);
+		//closet.addExits([Exit(NE, bedRoom)]);
+		//platform.addExits([Exit(W, hallway), Exit("Down", lobby, "You walk down the stairway and into the lobby.")]);
+		//lobby.addExits([Exit("Up", platform, "You walk up the staircase and onto the platform."), Exit(shop.name, shop), Exit("Ingredient Shop", ingredientshop)]);
+		//shop.addExits([Exit("Employees Only Door", null), Exit("Out", lobby)]);
+		//ingredientshop.addExits([Exit("Out", lobby) ])
 		
 		
 		/* Actors */
