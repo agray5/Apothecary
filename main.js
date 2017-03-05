@@ -973,8 +973,6 @@
 		let shop = Room("Your Shop",  "img/shop.png", null, "A sparse shop with cabinets lined agianst the back wall holding your products. In front of the cabinets is a bar with comfy looking stools for patrons to sit at. Going through the employees only door will lead into the inner bar area while the door to the east leads out. ");
 		let ingredientshop = Room("Ingredient Shop",  "img/ingShop.jpg", null, "A sparse shop with cabinets lined agianst the back wall holding your products. In front of the cabinets is a bar with comfy looking stools for patrons to sit at.");
 		/* exits */
-		let s = State(10);
-		console.log(s);
 		bedRoom.addExits([Exit("Bedroom", bedRoom), Exit(E, platform)]);
 		hallway.addExits([Exit("Bedroom", bedRoom), Exit(E, platform)]);
 		closet.addExits([Exit(NE, bedRoom)]);
@@ -1003,5 +1001,7 @@
 			addInv(comb);
 			addInv(key);
 			addInv(key);
+			
+			console.log("edit");
 		}
 
