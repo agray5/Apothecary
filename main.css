@@ -19,6 +19,7 @@
 	width: 165px;
 	margin-top: 40px;
 	margin-right: 40px;
+	text-align: center;
 }
 .cBtn:hover{
 	color: gold;
