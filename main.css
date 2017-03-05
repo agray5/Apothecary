@@ -1,8 +1,6 @@
 /********** Main Menu ***********/
-#bkgImg{
-	overflow: hidden;
-	z-index: -1;
-	/*eecb27*/
+#mainMenu{
+	background: url('img/m.jpg') center center/ cover no-repeat;
 }
 .cBtn{
 	background: url('img/button.jpg') center center/ cover no-repeat;
