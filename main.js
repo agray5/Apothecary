@@ -1,85 +1,169 @@
 /********** Object Constructors ***********/
-		const Item = (name, id, desc, inRoomDesc, value, type, subType, sprite, isTakeable, isExaminable, isEdible) => {
-		    this.invCount = 0;
-		    this.name = name;
-		    this.id = id;
-		    this.inRoomDesc = inRoomDesc;
-		    this.value = value;
-		    this.type = type;
-			this.subType = subType;
-			this.sprite = sprite;
-		    this.isTakeable = isTakeable;
-		    this.isExaminable = isExaminable;
-		    this.desc = desc;
-		    this.isEdible = isEdible;
-		    if (isTakeable == null) {
-		        this.isTakeable = false;
-		    }
-		    if (isExaminable == null) {
-		        this.isExaminable = false
-		    }
-		    if (isEdible == null) {
-		        this.isEdible = false;
-		    }
-		    if (value == null) {
-		        value = 0;
-		    }
-		};
-		var Room = function(name, bkg, initDesc, exits, morningDesc, noonDesc, eveningDesc, nightDesc,  isOutside, npcs, takeableItems, examinableItems) {
-			this.hasSeen = false;
-		    this.savedText = [];
-			this.bkg = bkg;
-		    this.exits = exits;
-		    this.name = name;
-			this.initDesc = initDesc;
-		    this.morningDesc = morningDesc;
-			this.noonDesc = noonDesc;
-			this.eveningDesc = eveningDesc;
-			this.nightDesc = nightDesc;
-		    this.npcs = npcs;
-		    this.takeableItems = takeableItems;
-		    this.examinableItems = examinableItems;
-		    this.isOutside = isOutside;
-		    if (npcs == null) {
-		        this.npcs = [];
-		    }
-		    if (takeableItems == null) {
-		        this.takeableItems = [];
-		    }
-		    if (examinableItems == null) {
-		        this.examinableItems = [];
-		    }
-		    if (isOutside == null) {
-		        this.isOutside = false;
-		    }
+		const Item = (name_, id_, desc_, inRoomDesc_ = "", value_ = 0, type_, subType_, sprite_, isTakeable_ = false, isExaminable_ = false, isEdible_ = false) => {
+		    let invCount = 0;
+		    let name = name_;
+		    let id = id_;
+		    let inRoomDesc = inRoomDesc_;
+		    let value = value_;
+		    let type = type_;
+			let subType = subType_;
+			let sprite = sprite_;
+		    let isTakeable = isTakeable_;
+		    let isExaminable = isExaminable_;
+		    let desc = desc_;
+		    let isEdible = isEdible_;
 			
-			const addExits = (exits) => {
-				this.exits = exits;
+			//Needed varibles
+			if(name === undefined){
+				throw new Error("Error: Item must have name.");
 			}
-		}
+			if(id === undefined){
+				throw new Error("Error: Item must have id.");
+			}
+			
+			if(desc === undefined){
+				throw new Error("Error: Item must have description.");
+			}
+			
+			return{
+				getName: () => {
+					return name;
+				},
+				getId: () => {
+					return id;
+				},
+				getDesc: () => {
+					return desc;
+				},
+				getInRoomDesc: () => {
+					return inRoomDesc;
+				},
+				getValue: () => {
+					return value;
+				}
+			}
+		};
+		const Room = (name_, bkg_, initDesc_, exits_, morningDesc_, noonDesc_ = morningDesc_, eveningDesc_ = morningDesc_, nightDesc_ = morningDesc_,  isOutside_ = false, npcs_ = [], takeableItems_ = [], examinableItems_) =>{
+			let hasSeen = false;
+		    let savedText = [];
+			let bkg = bkg_;
+		    let exits = exits_;
+		    let name = name_;
+			let initDesc = initDesc_;
+		    let morningDesc = morningDesc_;
+			let noonDesc = noonDesc_;
+			let eveningDesc = eveningDesc_;
+			let nightDesc = nightDesc_;
+		    let npcs = npcs_;
+		    let takeableItems = takeableItems_;
+		    let examinableItems = examinableItems_;
+		    let isOutside = isOutside_;
+			
+			if(noonDesc === undefined){
+				noonDesc = morningDesc;
+			}
+			if(eveningDesc === undefined){
+				eveningDesc = morningDesc;
+			}
+			if(nightDesc === undefined){
+				nightDesc = morningDesc;
+			}
+			
+			return {
+				getName: () => {
+					return name;
+				},
+				getBkg: () => {
+					return bkg;
+				},
+				getInitDesc: () => {
+					return initDesc;
+				},
+				getExits: () =>{
+					return exits;
+				},
+				getMorningDesc: () => {
+					return morningDesc;
+				},
+				getNoonDesc: () => {
+					return noonDesc;
+				},
+				getEveningDesc: () => {
+					return eveningDesc;
+				},
+				getNightDesc: () => {
+					return nightDesc;
+				},
+				isOutside: () => {
+					return isOutside;
+				},
+				getNpcs: () => {
+					return npcs;
+				},
+				getTakeableItems: () => {
+					return takeableItems;
+				},
+				getExamineableItems: () => {
+					return examinableItems;
+				},
+				addExits: (e) => {
+					if(!Array.isArray(e)){
+						throw new Error("Error: Room exit must be an array.");
+					}
+					else
+						exits = e;
+				}
+				
+			}
+			
+			
 		
-
+		};
 		
-		const Exit = (dir, nextRoom, exitMsg) => {
-		    this.dir = dir;
-		    this.nextRoom = nextRoom;
-		    this.exitMsg = exitMsg;
-		    if (exitMsg == null) {
-		        this.exitMsg = null;
-		    }
-		}
-		const Actor = (name, startState, cutOut) => {
-			this.name = name;
-			this.startState = startState;
-			this.cutOut = cutOut;
-			states = [];
-			convoNode = [];
-			startState;
-		}
 		
-		const State = (pages) => {
-			this.pages = pages;
-		}
+		const Exit = (dir_, nextRoom_, exitMsg_ = null) => {
+		    let dir = dir_;
+		    let nextRoom = nextRoom_;
+		    let exitMsg = exitMsg_;
+			
+			return{
+				getDir: () => {
+					return dir;
+				}
+			}
+		};
+		
+		const Actor = (name_, startState_, cutOut_, states_ = [] ) => {
+			let name = name_;
+			let startState = startState_;
+			let cutOut = cutOut_;
+			let states = states_;
+			
+			return{
+				getName: () => {
+					return name;
+				},
+				getStartState: () => {
+					return startState;
+				},
+				getCutOut: () => {
+					return cutOut;
+				},
+				getStates: () => {
+					return states;
+				}
+			}
+		};
+		
+		const State = (pages_) => {
+			let pages = pages_;
+			
+			return{
+				getPages: () => {
+					return pages;
+				}
+			}
+		};
 		/********** Varibles ***********/
 		let name = "Megiath";
 		let gender = "female";
@@ -123,25 +207,25 @@
 		};
 		const addExitsText = (exits) => {
 		    for (let e of exits) {
-		        $("ul.exit").append('<li id="' + e.dir + '"><a href="#">' + e.dir + '</li>');
+		        $("ul.exit").append('<li id="' + e.getDir() + '"><a href="#">' + e.getDir() + '</li>');
 		    }
 		};
     
 		const removeExits = (exits) => {
 		    for (let e of exits) {
-		        let str = "#" + e.dir;
+		        let str = "#" + e.getDir();
 		        $(str).remove();
 		    }
 		};
 		const addActionsBasedOnCurrRoom = () => {
 			if(!talking){
-				if (typeof currentRoom.npcs != "undefined" && currentRoom.npcs !== null && currentRoom.npcs.length > 0) {
+				if (typeof currentRoom.getNpcs() != "undefined" && currentRoom.getNpcs() !== null && currentRoom.getNpcs().length > 0) {
 					$(".action ul").append('<li id="talk"><a href="#">Talk To</li>');
 				}
-				if (typeof currentRoom.takeableItems != "undefined" && currentRoom.takeableItems !== null && currentRoom.takeableItems.length > 0) {
+				if (typeof currentRoom.getTakeableItems() != "undefined" && currentRoom.getTakeableItems() !== null && currentRoom.getTakeableItems().length > 0) {
 					$(".action ul").append('<li id="take"><a href="#">Take</li>');
 				}
-				if (typeof currentRoom.examinableItems != "undefined" && currentRoom.examinableItems !== null && currentRoom.examinableItems.length > 0) {
+				if (typeof currentRoom.getExamineableItems() != "undefined" && currentRoom.getExamineableItems() !== null && currentRoom.getExaminableItems().length > 0) {
 					$(".action ul").append('<li id="examine"><a href="#">Examine</li>');
 				}
 				$(".action ul").append('<li id="look"><a href="#">Look Around</li>');
@@ -182,10 +266,10 @@
 		    flushTextBox();
 		    updateRoomName(currentRoom.name);
 		    if (exit != null) {
-		        addText(exit.exitMsg);
+		        addText(exit.getExitMsg());
 		    }
-			if(!currentRoom.hasSeen && !(currentRoom.initDesc == null)){
-				 addText(currentRoom.initDesc);
+			if(!currentRoom.hasSeen && !(currentRoom.getInitDesc() === null)){
+				 addText(currentRoom.getInitDesc());
 			}
 			else{
 				switch(timeOfDay){
@@ -212,7 +296,7 @@
 				}
 			}		
 		    displayItemsInRoom();
-		    addExitsText(currentRoom.exits);
+		    addExitsText(currentRoom.getExits());
 		    addActionsBasedOnCurrRoom();
 		};
 		//used if we only want to refersh actions
@@ -222,10 +306,10 @@
 		};
 		/* Inventory*/
 		const addInv = (item) => {
-		    console.log("adding: " + item.name);
+		    console.log("adding: " + item.getName());
 		    if (item.invCount <= 0) {
 		        inventory.push(item);
-		        $(".inv ul").append("<li id=\"" + item.id + "\"><a class='pop' data-content='" + getInvLinks(item.id) + "'  data-toggle='popover' href='#' title='' data-original-title rel='popover'><span class='itemText'>" + item.name + '</span></a></li>');
+		        $(".inv ul").append("<li id=\"" + item.getId() + "\"><a class='pop' data-content='" + getInvLinks(item.getId()) + "'  data-toggle='popover' href='#' title='' data-original-title rel='popover'><span class='itemText'>" + item.getName() + '</span></a></li>');
 		        $(".pop").popover({
 		                trigger: "manual",
 		                html: true,
@@ -577,10 +661,10 @@
 			if(!talking){
 				talking = true;
 				$("#nameBoxText").text(actor.name);
-				$(".textBox").text(actor.startState.pages[0]);
-				$("#npcCutOut").append("<img src='"+actor.cutOut+"'>");
+				$(".textBox").text(actor.getStartState().getPages()[0]);
+				$("#npcCutOut").append("<img src='"+actor.getCutOut()+"'>");
 				$(".action ul").empty();
-				if(actor.startState.pages.length > 1)
+				if(actor.getStartState().getPages().length > 1)
 					addAction("next", "Next");
 				$(".textBox").css("font-size", "26px");
 				$(".textBox").css("bottom", "");
@@ -829,6 +913,7 @@
 			return obj;
 		}
 		
+		
 		const init = () => {
 			// Get the element with id="defaultOpen" and click on it
 			document.getElementById("defaultOpen").click();
@@ -875,31 +960,31 @@
 			+"Its true that its no smaller than what you use to back home, you did after all share a room of simular size with your sister, but its feels empty and lonely. "
 			+"The bed is covered in a plain spread with white sheets and a brown thin looking blanket. Your new desk is unadorned, just waiting to be covered in knick nacks and work forms. You spend the rest of the day unpacking your megar belongings and end the day with "
 			+"with a bath in your private wooden wash basin in the corner of the room. You apperciate the plain dividor hiding you from the view of the door.",
-		"Your bedroom is on the small side but at least its been furnished with a desk and a bed along the east wall. In the opposite corner a plain dividor hides a wooden wash basin. A door to the north leads out into the hallway.", [Exit(N, hallway), Exit(NW, closet)]);
-		let hallway = Room("Hallway",  "img/hallway.jpg", null, "A narrow hallway lined with doors", [Exit("Bedroom", bedRoom), Exit(E, platform)]);
-		let closet = Room("Closet",  "img/closet.jpg", null, "A walk in closet with plenty of room tp hang up clothes. The door out is to the northEast.", [Exit(NE, bedRoom)]);
+		"Your bedroom is on the small side but at least its been furnished with a desk and a bed along the east wall. In the opposite corner a plain dividor hides a wooden wash basin. A door to the north leads out into the hallway.");
+		let hallway = Room("Hallway",  "img/hallway.jpg", null, "A narrow hallway lined with doors");
+		let closet = Room("Closet",  "img/closet.jpg", null, "A walk in closet with plenty of room tp hang up clothes. The door out is to the northEast.");
 		//east wing rooms
 		//lobby rooms
-		let platform = Room("Platform", "img/platform.jpg", null, "You stand on a  platform overlooking the first floor of the castle. To the west there is the door leading to the west wing and to the east is the door to the east wing. Below you are stairs going down.", [Exit(W, hallway), Exit("Down", lobby, "You walk down the stairway and into the lobby.")]);
+		let platform = Room("Platform", "img/platform.jpg", null, "You stand on a  platform overlooking the first floor of the castle. To the west there is the door leading to the west wing and to the east is the door to the east wing. Below you are stairs going down.");
 		let lobby = Room("Lobby", "img/lobby.jpg", null, "This room could easily fit hundered people all scurring to complete one task or another. It was rare to see any royalty come this way as this is considered to be an extension of the castle workers living quarters. " +
 		    " It would be hard to complain though. Rays of sunlight stream through the high widows and sometimes small birds would fly in, chirping a merry song. The smell of freshly made food could be smelt from the nearby kitchen.", null, null, "This room could easily fit hundered people all scurring to complete one task or another. It was rare to see any royalty come this way as this is considered to be an extension of the castle workers living quarters. " +
-		    " It would be hard to complain though. The hall looked breathtaking at night. Streams of cool moonlight filter in through the widows, while colorful laterns have been lit along the walls bathing the hall in a myriad of colors.", 
-			[Exit("Up", platform, "You walk up the staircase and onto the platform."), Exit(shop.name, shop), Exit("Ingredient Shop", ingredientshop)]);
-		let shop = Room("Your Shop",  "img/shop.png", null, "A sparse shop with cabinets lined agianst the back wall holding your products. In front of the cabinets is a bar with comfy looking stools for patrons to sit at. Going through the employees only door will lead into the inner bar area while the door to the east leads out. ",
-			[Exit("Employees Only Door", null), Exit("Out", lobby)]);
-		let ingredientshop = Room("Ingredient Shop",  "img/ingShop.jpg", null, "A sparse shop with cabinets lined agianst the back wall holding your products. In front of the cabinets is a bar with comfy looking stools for patrons to sit at.", [Exit("Out", lobby) ]);
+		    " It would be hard to complain though. The hall looked breathtaking at night. Streams of cool moonlight filter in through the widows, while colorful laterns have been lit along the walls bathing the hall in a myriad of colors.");
+		let shop = Room("Your Shop",  "img/shop.png", null, "A sparse shop with cabinets lined agianst the back wall holding your products. In front of the cabinets is a bar with comfy looking stools for patrons to sit at. Going through the employees only door will lead into the inner bar area while the door to the east leads out. ");
+		let ingredientshop = Room("Ingredient Shop",  "img/ingShop.jpg", null, "A sparse shop with cabinets lined agianst the back wall holding your products. In front of the cabinets is a bar with comfy looking stools for patrons to sit at.");
 		/* exits */
-		//bedRoom.addExits);
-		//hallway.addExits([Exit("Bedroom", bedRoom), Exit(E, platform)]);
-		//closet.addExits([Exit(NE, bedRoom)]);
-		//platform.addExits([Exit(W, hallway), Exit("Down", lobby, "You walk down the stairway and into the lobby.")]);
-		//lobby.addExits([Exit("Up", platform, "You walk up the staircase and onto the platform."), Exit(shop.name, shop), Exit("Ingredient Shop", ingredientshop)]);
-		//shop.addExits([Exit("Employees Only Door", null), Exit("Out", lobby)]);
-		//ingredientshop.addExits([Exit("Out", lobby) ])
+		let s = State(10);
+		console.log(s);
+		bedRoom.addExits([Exit("Bedroom", bedRoom), Exit(E, platform)]);
+		hallway.addExits([Exit("Bedroom", bedRoom), Exit(E, platform)]);
+		closet.addExits([Exit(NE, bedRoom)]);
+		platform.addExits([Exit(W, hallway), Exit("Down", lobby, "You walk down the stairway and into the lobby.")]);
+		lobby.addExits([Exit("Up", platform, "You walk up the staircase and onto the platform."), Exit(shop.name, shop), Exit("Ingredient Shop", ingredientshop)]);
+		shop.addExits([Exit("Employees Only Door", null), Exit("Out", lobby)]);
+		ingredientshop.addExits([Exit("Out", lobby) ]);
 		
 		
 		/* Actors */
-		let AierithIntro = new State(
+		let AierithIntro = State(
 		["So you must be the famous "+name+". I am Aierith, the apothecary master of the castle. I am in charge of the apothecary room and making sure all the royal medicine needs are met. ",
 		 "As you can imagine this makes it diffcult to also attend to the needs of the workers and other residents of the castle. Thats where you come in. You will be my assistant, of sorts. ",
 		 "Don't look at me like that. I may of have heard good things about you but you just got here. You have to prove yourself first if you want full the privileges of the station.",
@@ -910,9 +995,12 @@
 		 "You are not required to complete these, but they pay a higher amount and if you fail they may be required to seek help else where. This may inevitably hurt your reputation and negativly impact your status. ",
 		 "With enough negative reports I may be forced to lower your rank. I know that it may be a lot to take in right now but I am sure you will get the hang of it."
 		 ])
-		let Aierith = new Actor("Aierith", AierithIntro, "img/Aierith.png");
+		let Aierith = Actor("Aierith", AierithIntro, "img/Aierith.png");
 		/********** Main ***********/
-		init();
-		addInv(comb);
-		addInv(key);
-		addInv(key);
+		window.onload = function () {
+			init();
+			addInv(comb);
+			addInv(key);
+			addInv(key);
+		}
+
