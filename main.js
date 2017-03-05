@@ -872,8 +872,8 @@
 		});
 		
 		$('#nameterm').keypress(function (e) {
-			let key = e.which;
-			if(key == 13) {
+			let keyPress = e.which;
+			if(keyPress == 13) {
 				if($('#nameterm').val() != ''){
 					name = $("#nameterm").val();
 					console.log(name);
@@ -890,19 +890,20 @@
 		/* New Game Click */
 		$("#NewGameBtn").on("click", function(event) {
 			$("#mainMenu").toggle();
-		    $("#startNewGame").toggle();
+			$("#startNewGame").toggle();
+			console.log("New game button click");
 		});
-			$('body').hover(function(event) {
-					console.log("hovering");
-					//find the element that dispatched the event
-					let target = $(event.target);
-					//make sure that the element that dispatched the event was NOT the .del-btn
-					if (!target.hasClass('pop')) {
-						//if ANY element on the body dispatched the event other than the .del-btn
-						//hide any open popovers
-						$('.pop').popover('hide');
+		
+		$('body').hover(function(event) {
+			//find the element that dispatched the event
+			let target = $(event.target);
+			//make sure that the element that dispatched the event was NOT the .del-btn
+			if (!target.hasClass('pop')) {
+			//if ANY element on the body dispatched the event other than the .del-btn
+			//hide any open popovers
+			$('.pop').popover('hide');
 					}
-		    });
+		 });
 			
 		/* Getters */
 		let getName = function(){
