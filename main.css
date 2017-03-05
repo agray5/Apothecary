@@ -19,34 +19,11 @@
 	color: gold;
 }
 
-#newGameBtn{
-	position: absolute;
-	top: 20%;
-	right: 20%;
+#mainBtnContainer{
+	display: flex;
+	flex-direction: column;
 }
 
-#loadGameBtn{
-	position: absolute;
-	top: 30%;
-	right: 20%;
-	margin-top: 20px;
-}
-
-#OptionsBtn{
-	position: absolute;
-	top: 40%;
-	right: 20%;
-	margin-top: 40px;
-	padding: 0 34px;
-}
-
-#CreditsBtn{
-	position: absolute;
-	top: 50%;
-	right: 20%;
-	margin-top: 60px;
-	padding: 0 34px;
-}
 /********** Start New Game ***********/
 #newGameBoard{
 	margin: 100px auto;
