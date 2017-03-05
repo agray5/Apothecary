@@ -17,6 +17,8 @@
 	z-index: 20;
 	height: 65px; 
 	width: 150px;
+	margin-top: 40px;
+	margin-right: 40px;
 }
 .cBtn:hover{
 	color: gold;
