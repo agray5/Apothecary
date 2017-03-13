@@ -879,7 +879,7 @@
                  if($('#nameterm').val() != ''){
                     name = $("#nameterm").val();
                     $("#startNewGame").toggle();
-                    roamInit();
+                    startGameInit();
                     $("#roam").toggle();
                 }
                 else{
@@ -990,7 +990,7 @@
         let Aierith = Actor("Aierith", AierithIntro, "img/Aierith.png");
         /********** Main ***********/
         window.onload = function () {
-            init();
+            preGameInit();
             addInv(comb);
             addInv(key);
             addInv(key);
