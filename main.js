@@ -55,7 +55,20 @@
                 },
                 isEdible: () => {
                     return isEdible;
+                },
+                getInvCount: () => {
+                    return invCount;
+                },
+                setInvCount: (a) => {
+                    invCount = a;
+                },
+                addCnt: () => {
+                    invCount++;
+                },
+                decCnt: () => {
+                    invCount--;
                 }
+                
             }
         };
         const Room = (name_, bkg_, initDesc_, exits_, morningDesc_, noonDesc_ = morningDesc_, eveningDesc_ = morningDesc_, nightDesc_ = morningDesc_,  isOutside_ = false, npcs_ = [], takeableItems_ = [], examinableItems_) =>{
@@ -74,13 +87,13 @@
             let examinableItems = examinableItems_;
             let isOutside = isOutside_;
             
-            if(noonDesc === undefined){
+            if(noonDesc === null){
                 noonDesc = morningDesc;
             }
-            if(eveningDesc === undefined){
+            if(eveningDesc === null){
                 eveningDesc = morningDesc;
             }
-            if(nightDesc === undefined){
+            if(nightDesc === null){
                 nightDesc = morningDesc;
             }
             
@@ -90,6 +103,9 @@
                 },
                 getBkg: () => {
                     return bkg;
+                },
+                getHasSeen: () => {
+                    return hasSeen;
                 },
                 getInitDesc: () => {
                     return initDesc;
@@ -109,6 +125,18 @@
                 getNightDesc: () => {
                     return nightDesc;
                 },
+                getDesc: () => {
+                    switch(timeOfDay){
+                        case "morning": 
+                            return morningDesc;
+                        case "noon":
+                            return noonDesc;
+                        case "evening":
+                            return eveningDesc;
+                        case "night":
+                            return nightDesc;
+                    }
+                },
                 isOutside: () => {
                     return isOutside;
                 },
@@ -120,6 +148,12 @@
                 },
                 getExamineableItems: () => {
                     return examinableItems;
+                },
+                setSavedText: (text) => {
+                  savedText = text;  
+                },
+                seenRoom: () => {
+                    hasSeen = true;
                 },
                 addExits: (e) => {
                     if(!Array.isArray(e)){
@@ -134,7 +168,6 @@
             
         
         };
-        
         
         const Exit = (dir_, nextRoom_, exitMsg_ = null) => {
             let dir = dir_;
@@ -264,57 +297,39 @@
         };
         
         const displayItemsInRoom = () => {
-            if (currentRoom.takeableItems != null && currentRoom.takeableItems.length > 0) {
-                for (let i of currentRoom.takeableItems) {
-                    addText('\n <span class="inTextBox" id="' + i.id + '">' + i.inRoomDesc + "</span>");
+            if (currentRoom.getTakeableItems() != null && currentRoom.getTakeableItems().length > 0) {
+                for (let i of currentRoom.getTakeableItems()) {
+                    addText('\n <span class="inTextBox" id="' + i.getId() + '">' + i.igetInRoomDesc() + "</span>");
                 }
             }
         };
         //based on current room, proper room connecter
         const changeRoom = (exit) => {
             takeTurn();
-            $(".main").css("background", "url("+currentRoom.bkg+") center center/ cover no-repeat ");
-            if (currentRoom.isOutside) {
+            $(".main").css("background", "url(" + currentRoom.getBkg() + ") center center/ cover no-repeat ");
+            //Is the player outside?
+            if (currentRoom.isOutside()) {
                 isOutside = true;
             }
-            currentRoom.savedText = [];
+            else
+                isOutside = false;
+            currentRoom.setSavedText([]);
             refreshRoom(exit);
-            if(!currentRoom.hasSeen)
-                currentRoom.hasSeen = true;
+            if(!currentRoom.getHasSeen())
+                currentRoom.seenRoom();
         };
         //only to refresh the room's state
         const refreshRoom = (exit) => {
             flushTextBox();
-            updateRoomName(currentRoom.name);
+            updateRoomName(currentRoom.getName());
             if (exit != null) {
                 addText(exit.getExitMsg());
             }
-            if(!currentRoom.hasSeen && !(currentRoom.getInitDesc() === null)){
+            if(!currentRoom.getHasSeen() && !(currentRoom.getInitDesc() === null)){
                  addText(currentRoom.getInitDesc());
             }
             else{
-                switch(timeOfDay){
-                    case "morning": 
-                        addText(currentRoom.morningDesc); break;
-                    case "noon":
-                        if(currentRoom.noonDesc == null)
-                            addText(currentRoom.morningDesc);
-                        else
-                            addText(currentRoom.noonDesc);
-                        break;
-                    case "evening":
-                        if(currentRoom.eveningDesc == null)
-                            addText(currentRoom.morningDesc);
-                        else
-                            addText(currentRoom.eveningDesc);
-                        break;
-                    case "night":
-                        if(currentRoom.nightDesc == null)
-                            addText(currentRoom.morningDesc);
-                        else
-                            addText(currentRoom.nightDesc);
-                        break;
-                }
+                addText(currentRoom.getDesc());
             }        
             displayItemsInRoom();
             addExitsText(currentRoom.getExits());
@@ -355,14 +370,14 @@
                         }, 30);
                     });
             } else {
-                let str = "#" + item.id + " .itemText";
-                $(str).text("" + item.name + " x " + (item.invCount + 1));
+                let str = "#" + item.getId() + " .itemText";
+                $(str).text("" + item.getName() + " x " + (item.getInvCount() + 1));
             }
             item.invCount++;
         };
         const removeInv = (item) => {
-            item.invCount--;
-            if (item.invCount <= 0) {
+            item.decCnt();
+            if (item.getinvCount() <= 0) {
                 let index = inventory.indexOf(item);
                 $('.pop').popover('hide');
                 if (index != -1) {
