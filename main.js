@@ -926,9 +926,7 @@
             $("#roam").toggle();
             //$("#mainMenu").toggle();
             $("#startNewGame").toggle();
-            $("#nameBox").toggle();
-            $(".Playername").text(name);
-            state = AierithIntro;
+            $("#nameBox").toggle(); 
             addMunny(100);
             currentRoom = bedRoom;
             changeRoom();
@@ -937,19 +935,20 @@
             equipment.push(blueSkirt);
             toggleTalk(Aierith);
         }
+        const roamInit = () => {
+            $(".Playername").text(name);
+            state = AierithIntro;
+        }
+        const ingShopInit = () => {
+            resetIngBuyMenu();
+            loadShopMenu();
+        } 
         
         $('body').keyup(function(e){
             if(e.keyCode == 13){
                 $(this).trigger("enterKey");
             }
         });
-        const roamInit = () => {
-            $(".Playername").text(name);
-        }
-        const ingShopInit = () => {
-            resetIngBuyMenu();
-            loadShopMenu();
-        }
         /********** Objects ***********/
         /* items */
         let key = Item("key", 1, "An old key.", "A small glinting object lays on the ground.", 2, "ing", null, null, true, true);
