@@ -926,7 +926,7 @@
         const roamInit = () => {
             $(".Playername").text(name);
             state = AierithIntro;
-            console("roamInit()");
+            console.log("roamInit()");
         }
         const ingShopInit = () => {
             resetIngBuyMenu();
