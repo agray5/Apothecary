@@ -925,7 +925,7 @@
         const roamInit = () => {
             $(".Playername").text(name);
         }
-        const startGameInit() => {
+        const startGameInit = () => {
             roamInit();
             state = AierithIntro;
             toggleTalk(Aierith);
