@@ -906,7 +906,7 @@
          });
         
         
-        const init = () => {
+        const preGameinit = () => {
             // Get the element with id="defaultOpen" and click on it
             document.getElementById("defaultOpen").click();
             ingShopCat = [key, comb];
@@ -920,13 +920,15 @@
             changeRoom();
             currentRoom.hasSeen = false;
             equipment.push(brownShirt);
-            equipment.push(blueSkirt);
-            toggleTalk(Aierith);
+            equipment.push(blueSkirt);            
         }
         const roamInit = () => {
             $(".Playername").text(name);
+        }
+        const startGameInit() => {
+            roamInit();
             state = AierithIntro;
-            console.log("roamInit()");
+            toggleTalk(Aierith);
         }
         const ingShopInit = () => {
             resetIngBuyMenu();
