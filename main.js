@@ -863,32 +863,28 @@
         /* New Game Name Enter Click*/
         $("#nameEnter").on("click", function(event) {
         if($('#nameterm').val() != ''){
-                name = $("#nameterm").val();
-                console.log(name);
-                $("#startNewGame").toggle();
-                roamInit();
-                $("#roam").toggle();
-            }
-            else{
-                $("#nameterm").attr("placeholder", "Please enter a name");
-            }
+                enterName();
         });
         
         $('#nameterm').keypress(function (e) {
             let keyPress = e.which;
             if(keyPress == 13) {
-                if($('#nameterm').val() != ''){
+                enterName();
+                }
+            }
+        });   
+
+        
+        const enterName = () => {
+                 if($('#nameterm').val() != ''){
                     name = $("#nameterm").val();
-                    console.log(name);
                     $("#startNewGame").toggle();
                     roamInit();
                     $("#roam").toggle();
                 }
                 else{
-                    $("#nameterm").attr("placeholder", "Please enter a name");
-                }
-            }
-        });   
+                    $("#nameterm").attr("placeholder", "Please enter a name");       
+        }
         
         /* New Game Click */
         $("#NewGameBtn").on("click", function(event) {
@@ -907,15 +903,6 @@
             $('.pop').popover('hide');
                     }
          });
-            
-        /* Getters */
-        let getName = function(){
-            return name;
-        };
-        
-        const get = (obj) => {
-            return obj;
-        }
         
         
         const init = () => {
@@ -938,6 +925,7 @@
         const roamInit = () => {
             $(".Playername").text(name);
             state = AierithIntro;
+            console("roamInit()");
         }
         const ingShopInit = () => {
             resetIngBuyMenu();
