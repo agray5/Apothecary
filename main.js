@@ -684,11 +684,11 @@
         }
         
         const turnPageFwd = () => {
-            if(currentPage < state.pages.length){
+            if(currentPage < state.getPages().length){
                 currentPage++;
-                $(".textBox").text(state.pages[currentPage]);
+                $(".textBox").text(state.getPages()[currentPage]);
             }
-            if(currentPage == state.pages.length - 1){
+            if(currentPage == state.getPages().length - 1){
                 removeAction("next");
                 addAction("endConvo", "Goodbye");
             }
@@ -702,12 +702,12 @@
         const turnPagePre = function(){
             if(currentPage > 0){
                 currentPage--;
-                $(".textBox").text(state.pages[currentPage]);
+                $(".textBox").text(state.getPages()[currentPage]);
             }
             if(currentPage == 0){
                 removeAction("prev");
             }
-            else if(currentPage == state.pages.length - 2){
+            else if(currentPage == state.getPages().length - 2){
                 addAction("next", "Next");
             }
         }
