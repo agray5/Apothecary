@@ -41,8 +41,20 @@
                 getValue: () => {
                     return value;
                 },
-                getValue: () => {
-                    return value;
+                getType: () => {
+                    return type;
+                },
+                getSprite: () => {
+                    return sprite;
+                },
+                getSubType: () => {
+                    return subType; 
+                },
+                isExaminable: () => {
+                    return: isExaminable;
+                },
+                isEdible: () => {
+                    return: isEdible;
                 }
             }
         };
@@ -132,6 +144,12 @@
             return{
                 getDir: () => {
                     return dir;
+                },
+                getNextRoom: () => {
+                    return nextRoom;
+                },
+                getExitMsg: () => {
+                    return exitMsg;
                 }
             }
         };
@@ -150,7 +168,7 @@
                     return startState;
                 },
                 getCutOut: () => {
-                    return cutOut;
+                    return cutOut
                 },
                 getStates: () => {
                     return states;
@@ -640,7 +658,7 @@
                     return;
                 console.log(this);
                 $(this).empty();
-                $(this).append("<img src="+equipment[eLength - 1].sprite+" class= '"+equipment[eLength - 1].subType+"' onclick='equip("+(equipment[eLength - 1].id)+"); equipDisplayInfo("+(equipment[eLength - 1].id)+");' onmouseover='equipDisplayInfo("+(equipment[eLength - 1].id)+");'>");    
+                $(this).append("<img src="+equipment[eLength - 1].getSprite()+" class= '"+equipment[eLength - 1].getSubType()+"' onclick='equip("+(equipment[eLength - 1].getId())+"); equipDisplayInfo("+(equipment[eLength - 1].id)+");' onmouseover='equipDisplayInfo("+(equipment[eLength - 1].id)+");'>");    
                 eLength--;
             });
         };
@@ -649,7 +667,7 @@
             for(let i of equipment){
                 if(i.id == id){
                     $('#equipInfo').empty();
-                    $('#equipInfo').append("<span class='cap'>"+i.name + "<br> value: "+i.value + " mun</span><br>"+ i.desc);
+                    $('#equipInfo').append("<span class='cap'>"+i.getName() + "<br> value: "+i.getValue() + " mun</span><br>"+ i.getDesc());
                 }
             }
         };
@@ -663,7 +681,7 @@
             console.log("toggle talk");
             if(!talking){
                 talking = true;
-                $("#nameBoxText").text(actor.name);
+                $("#nameBoxText").text(actor.getName());
                 $(".textBox").text(actor.getStartState().getPages()[0]);
                 $("#npcCutOut").append("<img src='"+actor.getCutOut()+"'>");
                 $(".action ul").empty();
@@ -717,7 +735,7 @@
         
         /* Actions */
         const lookAround = () => {
-            addText(currentRoom.desc);
+            addText(currentRoom.getDesc());
             displayItemsInRoom();
         };
         
@@ -761,15 +779,15 @@
         $(".exit").on("click", "li", function(event) {
             if(!talking){
                 let oldRoom = currentRoom;
-                for (let e of currentRoom.exits) {
-                    if (e.dir == this.id) {
-                        currentRoom = e.nextRoom;
-                        if (e.nextRoom == null) {
-                            console.log(e.dir);
+                for (let e of currentRoom.getExits()) {
+                    if (e.getDir() === this.getId()) {
+                        currentRoom = e.getNextRoom();
+                        if (e.getNextRoom() == null) {
+                            console.log(e.getDir());
                             console.log("room is null");
                         } else {
-                            if (currentRoom != oldRoom) {
-                                if (e.exitMsg != null)
+                            if (currentRoom !== oldRoom) {
+                                if (e.getExitMsg() != null)
                                     changeRoom(e);
                                 else
                                     changeRoom();
@@ -793,8 +811,8 @@
         /* Take Click */
         $(".action").on("click", "#take", function(event) {
             $(".action ul").empty();
-            for (let i of currentRoom.takeableItems) {
-                $(".action ul").append('<li class = "takeable" id="' + i.id + '"><a href="#">' + i.name + '</a></li>');
+            for (let i of currentRoom.getTakeableItems()) {
+                $(".action ul").append('<li class = "takeable" id="' + i.getId() + '"><a href="#">' + i.getName() + '</a></li>');
             }
             $(".action ul").append('<li id="back"><button type="image" src="img/parch.png" class = "btn-custom" class="btn ">Back</button></li>');
         });
@@ -802,12 +820,12 @@
         /* Take.Item Click */
         $(".action").on("click", "li.takeable", function(event) {
             takeTurn();
-            for (let i of currentRoom.takeableItems) {
-                if (i.id == this.id) {
+            for (let i of currentRoom.getTakeableItems()) {
+                if (i.getId() == this.getId()) {
                     takeItem(i);
                 }
             }
-            if (currentRoom.takeableItems.length == 0) {
+            if (currentRoom.getTakeableItems().length == 0) {
                 menuBack();
             }
         });
@@ -837,7 +855,7 @@
             let psconsole = $('.textBox');
             if(psconsole.length){
                 psconsole.scrollTop(psconsole[0].scrollHeight - psconsole.height());
-                console.log("down");
+                console.log("Scroll Textbox down");
             }
         };
         
@@ -845,7 +863,7 @@
             let psconsole = $('.textBox');
             if(psconsole.length){
                 psconsole.scrollTop(0);
-                console.log("up");
+                console.log("Scroll Text Box up");
             }
         };
         
@@ -854,8 +872,8 @@
         const examine = (item) => {
             console.log('worked');
             for (let i of inventory) {
-                if (i.id == item) {
-                    addText("You remove the " + i.name + " from your bag and examine it. " + i.desc);
+                if (i.getId() == item) {
+                    addText("You remove the " + i.getName() + " from your bag and examine it. " + i.getDesc());
                     scrollText();
                 }
             }
