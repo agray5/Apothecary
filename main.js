@@ -51,10 +51,10 @@
                     return subType; 
                 },
                 isExaminable: () => {
-                    return: isExaminable;
+                    return isExaminable;
                 },
                 isEdible: () => {
-                    return: isEdible;
+                    return isEdible;
                 }
             }
         };
