@@ -990,7 +990,7 @@
         let Aierith = Actor("Aierith", AierithIntro, "img/Aierith.png");
         /********** Main ***********/
         window.onload = function () {
-            preGameInit();
+            preGameinit();
             addInv(comb);
             addInv(key);
             addInv(key);
