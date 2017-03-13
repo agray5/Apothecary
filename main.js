@@ -862,15 +862,15 @@
         }
         /* New Game Name Enter Click*/
         $("#nameEnter").on("click", function(event) {
-        if($('#nameterm').val() != ''){
-                enterName();
+                if($('#nameterm').val() != ''){
+                        enterName();
+                }
         });
         
         $('#nameterm').keypress(function (e) {
             let keyPress = e.which;
             if(keyPress == 13) {
                 enterName();
-                }
             }
         });   
 
@@ -883,7 +883,8 @@
                     $("#roam").toggle();
                 }
                 else{
-                    $("#nameterm").attr("placeholder", "Please enter a name");       
+                    $("#nameterm").attr("placeholder", "Please enter a name");     
+                }
         }
         
         /* New Game Click */
