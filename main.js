@@ -70,7 +70,7 @@
                 },
                 remove: (count = 1) => {
                     invCount -= count;
-                    if(invCount <== 0){ //Item is no longer in inventory
+                    if(invCount <= 0){ //Item is no longer in inventory
                         invCout = 0;
                         let index = inventory.indexOf(this);
                          $('.pop').popover('hide');
