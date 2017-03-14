@@ -405,7 +405,7 @@
         //fix string
         const dropItem = (item) => {
             for (let i of inventory) {
-                if (i.id == item) {
+                if (i.getId() == item) {
                     i.remove();
                     if (currentRoom.getTakeableItems() == null) {
                         console.log("currentRoom.takeableItems is null");
@@ -418,7 +418,7 @@
             }
         };
         const takeItem = (item) => {
-            if(item.type == "equip")
+            if(item.getType() == "equip")
                 equipment.push(item);
             else
                 item.add();
@@ -434,7 +434,7 @@
         const getInvLinks = (id) => {
             let obj = null;
             for (let o of inventory) {
-                if (o.id == id) {
+                if (o.getId() === id) {
                     obj = o;
                 }
             }
@@ -614,9 +614,9 @@
             console.log("equipping,,");
             let sel, sel2, style1, style2, class_;
             for(let i of equipment){
-                if(i.id == id){
+                if(i.getId() == id){
                     equipped.push(i);
-                    switch(i.subType){
+                    switch(i.getSubType()){
                         case "hat": 
                             sel = "#hatE"; 
                             sel2 = "#playerHat";
@@ -680,14 +680,14 @@
                     return;
                 console.log(this);
                 $(this).empty();
-                $(this).append("<img src="+equipment[eLength - 1].getSprite()+" class= '"+equipment[eLength - 1].getSubType()+"' onclick='equip("+(equipment[eLength - 1].getId())+"); equipDisplayInfo("+(equipment[eLength - 1].id)+");' onmouseover='equipDisplayInfo("+(equipment[eLength - 1].id)+");'>");    
+                $(this).append("<img src="+equipment[eLength - 1].getSprite()+" class= '"+equipment[eLength - 1].getSubType()+"' onclick='equip("+(equipment[eLength - 1].getId())+"); equipDisplayInfo("+(equipment[eLength - 1].getId())+");' onmouseover='equipDisplayInfo("+(equipment[eLength - 1].getId())+");'>");    
                 eLength--;
             });
         };
         
         const equipDisplayInfo = (id) => {
             for(let i of equipment){
-                if(i.id == id){
+                if(i.getId() == id){
                     $('#equipInfo').empty();
                     $('#equipInfo').append("<span class='cap'>"+i.getName() + "<br> value: "+i.getValue() + " mun</span><br>"+ i.getDesc());
                 }
