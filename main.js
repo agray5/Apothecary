@@ -93,6 +93,7 @@
                     invCount += count;
                     if (inventory.indexOf(this) === -1) { //If the item is not in inventory
                         inventory.push(this);
+                        console.log(inventory);
                         let itemText = name;
                         if(invCount > 1){
                             itemText = "" + name + " x " + invCount; //Display item amount if greater than 1
