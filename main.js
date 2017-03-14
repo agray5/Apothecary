@@ -125,9 +125,10 @@
                     else {
                         let str = "#" + id + " .itemText";
                         $(str).text("" + name + " x " + invCount);
-                    }
-                }                    
-        };
+                    }// /else
+                } // /add  
+            } // /return
+        }; // /Item
             
             
         const Room = (name_, bkg_, initDesc_, exits_, morningDesc_, noonDesc_ = morningDesc_, eveningDesc_ = morningDesc_, nightDesc_ = morningDesc_,  isOutside_ = false, npcs_ = [], takeableItems_ = [], examinableItems_) =>{
