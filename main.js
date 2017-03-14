@@ -67,10 +67,69 @@
                 },
                 decCnt: () => {
                     invCount--;
-                }
-                
-            }
+                },
+                remove: (count = 1) => {
+                    invCount -= count;
+                    if(invCount <== 0){ //Item is no longer in inventory
+                        invCout = 0;
+                        let index = inventory.indexOf(this);
+                         $('.pop').popover('hide');
+                        if (index !== -1) {
+                            inventory.splice(index, 1);//Remove item from inventory
+                        }
+                        let str = "#" + id;
+                        $(str).remove();
+                    }
+                    else if(invCount === 1){ //Only one of item is in inventory
+                        let str1 = "#" + id + " .itemText";
+                        $(str1).text(name); //Removes item count by name in inventory
+                    }
+                    else{ //Multiple items left
+                         let str1 = "#" + id + " .itemText";
+                         $(str1).text("" + name + " x " + invCount); //Display how many of inventory item there is
+                    }
+                },
+                add: (count = 1) => { 
+                    invCount += count;
+                    if (inventory.indexOf(this) === -1) { //If the item is not in inventory
+                        inventory.push(this);
+                        let itemText = name;
+                        if(invCount > 1){
+                            itemText = "" + name + " x " + invCount; //Display item amount if greater than 1
+                        }
+                        $(".inv ul").append("<li id=\"" + id + "\"><a class='pop' data-content='" + getInvLinks(id) + "'  data-toggle='popover' href='#' title='' data-original-title rel='popover'><span class='itemText'>" + itemText + '</span></a></li>');
+                        $(".pop").popover({
+                            trigger: "manual",
+                            html: true,
+                            animation: false,
+                            placement: 'right',
+                            container: 'body',
+                        })
+                        .on("mouseenter", function() {
+                            if(!talking){
+                            let _this = this;
+                            $(this).popover("show");
+                            $(".popover").on("mouseleave", function() {
+                                $(_this).popover('hide');
+                            });
+                            }
+                        }).on("mouseleave", function() {
+                            let _this = this;
+                            setTimeout(function() {
+                                if (!$(".popover:hover").length) {
+                                    $(_this).popover("hide");
+                                }
+                            }, 30);
+                        });
+                    }
+                    else {
+                        let str = "#" + id + " .itemText";
+                        $(str).text("" + name + " x " + invCount);
+                    }
+                }                    
         };
+            
+            
         const Room = (name_, bkg_, initDesc_, exits_, morningDesc_, noonDesc_ = morningDesc_, eveningDesc_ = morningDesc_, nightDesc_ = morningDesc_,  isOutside_ = false, npcs_ = [], takeableItems_ = [], examinableItems_) =>{
             let hasSeen = false;
             let savedText = [];
@@ -341,69 +400,16 @@
             addActionsBasedOnCurrRoom();
         };
         /* Inventory*/
-        const addInv = (item) => {
-            console.log("adding: " + item.getName());
-            if (item.invCount <= 0) {
-                inventory.push(item);
-                $(".inv ul").append("<li id=\"" + item.getId() + "\"><a class='pop' data-content='" + getInvLinks(item.getId()) + "'  data-toggle='popover' href='#' title='' data-original-title rel='popover'><span class='itemText'>" + item.getName() + '</span></a></li>');
-                $(".pop").popover({
-                        trigger: "manual",
-                        html: true,
-                        animation: false,
-                        placement: 'right',
-                        container: 'body',
-                    })
-                    .on("mouseenter", function() {
-                        if(!talking){
-                        let _this = this;
-                        $(this).popover("show");
-                        $(".popover").on("mouseleave", function() {
-                            $(_this).popover('hide');
-                        });
-                        }
-                    }).on("mouseleave", function() {
-                        let _this = this;
-                        setTimeout(function() {
-                            if (!$(".popover:hover").length) {
-                                $(_this).popover("hide");
-                            }
-                        }, 30);
-                    });
-            } else {
-                let str = "#" + item.getId() + " .itemText";
-                $(str).text("" + item.getName() + " x " + (item.getInvCount() + 1));
-            }
-            item.invCount++;
-        };
-        const removeInv = (item) => {
-            item.decCnt();
-            if (item.getinvCount() <= 0) {
-                let index = inventory.indexOf(item);
-                $('.pop').popover('hide');
-                if (index != -1) {
-                    inventory.splice(index, 1);
-                }
-                let str = "#" + item.id;
-                $(str).remove();
-            } else {
-                if (item.invCount == 1) {
-                    let str1 = "#" + item.id + " .itemText";
-                    $(str1).text(item.name);
-                } else {
-                    let str1 = "#" + item.id + " .itemText";
-                    $(str1).text("" + item.name + " x " + (item.invCount + 1));
-                }
-            }
-        };
+
         //fix string
         const dropItem = (item) => {
             for (let i of inventory) {
                 if (i.id == item) {
-                    removeInv(i);
-                    if (currentRoom.takeableItems == null) {
+                    i.remove();
+                    if (currentRoom.getTakeableItems() == null) {
                         console.log("currentRoom.takeableItems is null");
                     }
-                    currentRoom.takeableItems.push(i);
+                    currentRoom.getTakeableItems().push(i);
                     refreshActions();
                     lookAround();
                     //scrollText();
@@ -414,14 +420,14 @@
             if(item.type == "equip")
                 equipment.push(item);
             else
-                addInv(item);
-            let index = currentRoom.takeableItems.indexOf(item);
+                item.add();
+            let index = currentRoom.getTakeableItems().indexOf(item);
             if (index != -1) {
-                currentRoom.takeableItems.splice(index, 1);
+                currentRoom.getTakeableItems().splice(index, 1);
             }
-            let str = "#" + item.id + ".inTextBox";
+            let str = "#" + item.getId() + ".inTextBox";
             $(str).remove();
-            str = "#" + item.id + ".takeable";
+            str = "#" + item.getId() + ".takeable";
             $(str).remove();
         };
         const getInvLinks = (id) => {
@@ -432,11 +438,11 @@
                 }
             }
             let str = '';
-            if (obj.isEdible) {
+            if (obj.isEdible()) {
                 str += '<a id=&quot;eat&quot; href=&quot;#&quot;>Eat</a><br>';
             }
-            str += '<a id=&quot;examine&quot; href=&quot;javascript:examine(' + obj.id + ')&quot;>Examine</a><br>';
-            str += '<a d=&quot;drop&quot; href=&quot;javascript:dropItem(' + obj.id + ')&quot;>Drop</a>';
+            str += '<a id=&quot;examine&quot; href=&quot;javascript:examine(' + obj.getId() + ')&quot;>Examine</a><br>';
+            str += '<a d=&quot;drop&quot; href=&quot;javascript:dropItem(' + obj.getId() + ')&quot;>Drop</a>';
             return str;
         };
         /* Munny */
@@ -496,8 +502,8 @@
         });
         const loadShopMenu = () => {
             for (let i of ingShopCat) {
-                $("#buyTable").append('<tr id=' + i.id + 'BM><td>' + selectIcon(i.type) + "  " + i.name + '</td><td>' + i.value + '</td><td>X</td><td><span class="buyAmount"><button class="up" onclick="javascript:setQuantity(\'up\',' + i.id + ',' + i.value + ')">+</button>' +
-                    '<input type="text" value="0" style="width: 20px"><button class="down" onclick="javascript:setQuantity(\'down\',' + i.id + ',' + i.value + ')">-</button></span></td><td><span class="buyItemTotal">0</td></tr>');
+                $("#buyTable").append('<tr id=' + i.getId() + 'BM><td>' + selectIcon(i.getType()) + "  " + i.getName() + '</td><td>' + i.getValue() + '</td><td>X</td><td><span class="buyAmount"><button class="up" onclick="javascript:setQuantity(\'up\',' + i.getId() + ',' + i.getValue() + ')">+</button>' +
+                    '<input type="text" value="0" style="width: 20px"><button class="down" onclick="javascript:setQuantity(\'down\',' + i.getId() + ',' + i.getValue() + ')">-</button></span></td><td><span class="buyItemTotal">0</td></tr>');
             }
         }
         const setQuantity = (upordown, id, cost) => {
@@ -536,11 +542,11 @@
             subMunny(total);
             $('#buyTotalAmount').text(0);
             for (let i of ingShopCat) {
-                let str = '#' + i.id + 'BM input';
-                let str2 = '#' + i.id + 'BM .buyItemTotal';
+                let str = '#' + i.getId() + 'BM input';
+                let str2 = '#' + i.getId() + 'BM .buyItemTotal';
                 let itemTot = parseInt($(str).val());
                 if (itemTot > 0) {
-                    addInv(i);
+                    i.add()
                 }
                 $(str).val(0);
                 $(str2).text(0);
@@ -551,8 +557,8 @@
         const resetIngBuyMenu = () => {
             $('#buyTotalAmount').text(0);
             for (let i of ingShopCat) {
-                let str = '#' + i.id + 'BM input';
-                let str2 = '#' + i.id + 'BM .buyItemTotal';
+                let str = '#' + i.getId() + 'BM input';
+                let str2 = '#' + i.getId() + 'BM .buyItemTotal';
                 $(str).val(0);
                 $(str2).text(0);
             }
@@ -588,8 +594,8 @@
         const loadInvMenu = () => {
             $("#invTable").append("<tr><th>Name</th><th>Value</th><th>Amount</th><th>Total Value</th></tr>")
             for (let i of inventory) {    
-                let total = i.invCount * i.value;
-                $("#invTable").append('<tr id=' + i.id + 'IM><td>' + selectIcon(i.type) + "  " + i.name + '</td><td>' + i.value + '</td><td>'+i.invCount+'</td><td>'+ total +'</td><td><button class="myBtn" id="jInvDrop" onclick="javascript:jInvDrop('+ i.id +')">Drop</button></td></tr>');
+                let total = i.getInvCount() * i.getValue();
+                $("#invTable").append('<tr id=' + i.getId() + 'IM><td>' + selectIcon(i.getType()) + "  " + i.getName() + '</td><td>' + i.getValue() + '</td><td>' + i.getInvCount() + '</td><td>'+ total +'</td><td><button class="myBtn" id="jInvDrop" onclick="javascript:jInvDrop('+ i.getId() +')">Drop</button></td></tr>');
             }
         }
         const resetInvMenu = () => {
@@ -649,8 +655,8 @@
                     console.log("sel= "+sel);
                     $(sel).empty();
                     $(sel2).empty();
-                    $(sel).append("<img src="+i.sprite+" style='align:center; "+style1+"'>");    
-                    $(sel2).append("<img src="+i.sprite+" class ='"+class_+"' style='"+style2+" position: absolute;'>");    
+                    $(sel).append("<img src="+i.getSprite()+" style='align:center; "+style1+"'>");    
+                    $(sel2).append("<img src="+i.getSprite()+" class ='"+class_+"' style='"+style2+" position: absolute;'>");    
                     loadAvatar();
                 }
             }
@@ -1024,9 +1030,8 @@
         /********** Main ***********/
         window.onload = function () {
             preGameinit();
-            addInv(comb);
-            addInv(key);
-            addInv(key);
+            comb.add();
+            key.add(2);
             
             console.log("edit");
         }
