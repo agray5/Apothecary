@@ -233,7 +233,7 @@
                         console.log("Error: cannot get item count. Item is null"); 
                         return;
                     }
-                    for(let i : inventory){
+                    for(let i of inventory){
                         if(i.getItem() === item){
                             return i.getCount();
                         }
@@ -241,7 +241,7 @@
                     console.log("Error: actor does not have item ", item, " in their inventory");
                 },
                 addToInv: (item, amount = 1) => { 
-                    for(let i : inventory){
+                    for(let i of inventory){
                         if(i.getItem() === item){
                             i.add(amount);
                             return;
@@ -250,7 +250,7 @@
                     inventory.push(InvItem(item, amount));
                 },
                 subFromInv: (item, amount = 1) => {
-                    for(let i : inventory){
+                    for(let i of inventory){
                         if(i.getItem() === item){
                             i.remove(amount);
                             if(i.getCount() <= 0){
@@ -280,7 +280,7 @@
                         console.log("Error: cannot get item count. Item is null"); 
                         return;
                     }
-                    for(let i : inventory){
+                    for(let i of inventory){
                         if(i.getItem() === item){
                             return i.getCount();
                         }
@@ -290,7 +290,7 @@
                 subFromInv: (item, amount = 1) => {
                     let itemText;
                     
-                    for(let i : inventory){
+                    for(let i of inventory){
                         if(i.getItem() === item){ //Item is in inventory
                             i.remove(amount);
                             if(i.getCount() <= 0){ //There are no more of this item after it has been removed
@@ -323,7 +323,7 @@
                     actionLinks += '<a id=&quot;examine&quot; href=&quot;javascript:examine(' + item.getId() + ')&quot;>Examine</a><br>';
                     actionLinks += '<a d=&quot;drop&quot; href=&quot;javascript:dropItem(' + item.getId() + ')&quot;>Drop</a>';
                     
-                    for(let i : inventory){
+                    for(let i of inventory){
                         if(i.getItem() === item){ //Item exsists in player inventory
                             i.add(amount);
                             itemText = "#" + item.getId() + " .itemText";
@@ -405,7 +405,7 @@
                 } // /add  
                     },
                     subFromInv: (item, amount = 1) => {
-                        for(let i : inventory){
+                        for(let i of inventory){
                             if(i.getItem() === item){
                                 i.remove(amount);
                                 if(i.getCount() <= 0){
