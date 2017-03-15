@@ -55,67 +55,7 @@
                 },
                 isEdible: () => {
                     return isEdible;
-                },
-                remove: (count = 1) => {
-                    invCount -= count;
-                    if(invCount <= 0){ //Item is no longer in inventory
-                        invCout = 0;
-                        let index = inventory.indexOf(this);
-                         $('.pop').popover('hide');
-                        if (index !== -1) {
-                            inventory.splice(index, 1);//Remove item from inventory
-                        }
-                        let str = "#" + id;
-                        $(str).remove();
-                    }
-                    else if(invCount === 1){ //Only one of item is in inventory
-                        let str1 = "#" + id + " .itemText";
-                        $(str1).text(name); //Removes item count by name in inventory
-                    }
-                    else{ //Multiple items left
-                         let str1 = "#" + id + " .itemText";
-                         $(str1).text("" + name + " x " + invCount); //Display how many of inventory item there is
-                    }
-                },
-                add: (count = 1) => { 
-                    invCount += count;
-                    if (inventory.indexOf(this) === -1) { //If the item is not in inventory
-                        inventory.push(this);
-                        console.log(inventory);
-                        let itemText = name;
-                        if(invCount > 1){
-                            itemText = "" + name + " x " + invCount; //Display item amount if greater than 1
-                        }
-                        $(".inv ul").append("<li id=\"" + id + "\"><a class='pop' data-content='" + getInvLinks(id) + "'  data-toggle='popover' href='#' title='' data-original-title rel='popover'><span class='itemText'>" + itemText + '</span></a></li>');
-                        $(".pop").popover({
-                            trigger: "manual",
-                            html: true,
-                            animation: false,
-                            placement: 'right',
-                            container: 'body',
-                        })
-                        .on("mouseenter", function() {
-                            if(!talking){
-                            let _this = this;
-                            $(this).popover("show");
-                            $(".popover").on("mouseleave", function() {
-                                $(_this).popover('hide');
-                            });
-                            }
-                        }).on("mouseleave", function() {
-                            let _this = this;
-                            setTimeout(function() {
-                                if (!$(".popover:hover").length) {
-                                    $(_this).popover("hide");
-                                }
-                            }, 30);
-                        });
-                    }
-                    else {
-                        let str = "#" + id + " .itemText";
-                        $(str).text("" + name + " x " + invCount);
-                    }// /else
-                } // /add  
+                }
             } // /return
         }; // /Item
             
@@ -346,6 +286,31 @@
                         }
                     }
                     console.log("Error: player does not have item ", item, " in their inventory");
+                },
+                subFromInv: (item, amount = 1) => {
+                    let itemText;
+                    
+                    for(let i : inventory){
+                        if(i.getItem() === item){ //Item is in inventory
+                            i.remove(amount);
+                            if(i.getCount() <= 0){ //There are no more of this item after it has been removed
+                                inventory.splice(inventory.indexOf(i), 1);
+                                $('.pop').popover('hide');
+                                itemText = "#" + item.getId(); 
+                                $(itemText).remove(); //Remove item from displayed inventory
+                            }
+                            else if(i.getCount === 1){ //There is only one of the item now
+                                itemText = "#" + id + " .itemText";
+                                $(itemText).text(item.getName()); //Removes item count by name in inventory
+                            }
+                            else{ //Multiple items left
+                                itemText = "#" + id + " .itemText";
+                                $(itemText).text("" + item.getName() + " x " + i.getCount());
+                            }
+                            return;
+                        }
+                    }
+                    console.log("Error: item: ", item, " could not be subtracted from actor's inventory. " , "item: ", item, " does not exsist in actor's inventory.");
                 },
                 addToInv: (item, amount = 1) => { 
                     let itemText;
