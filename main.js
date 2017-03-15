@@ -1,6 +1,6 @@
 /********** Object Constructors ***********/
+        //Should only be one of each
         const Item = (name_, id_, desc_, inRoomDesc_ = "", value_ = 0, type_, subType_, sprite_, isTakeable_ = false, isExaminable_ = false, isEdible_ = false) => {
-            let invCount = 0;
             let name = name_;
             let id = id_;
             let inRoomDesc = inRoomDesc_;
@@ -14,10 +14,10 @@
             let isEdible = isEdible_;
             
             //Needed varibles
-            if(name === undefined){
+            if(name == null){
                 throw new Error("Error: Item must have name.");
             }
-            if(id === undefined){
+            if(id == null){
                 throw new Error("Error: Item must have id.");
             }
             
@@ -55,18 +55,6 @@
                 },
                 isEdible: () => {
                     return isEdible;
-                },
-                getInvCount: () => {
-                    return invCount;
-                },
-                setInvCount: (a) => {
-                    invCount = a;
-                },
-                addCnt: () => {
-                    invCount++;
-                },
-                decCnt: () => {
-                    invCount--;
                 },
                 remove: (count = 1) => {
                     invCount -= count;
@@ -131,6 +119,34 @@
             } // /return
         }; // /Item
             
+        //Mapping an item to an inventory count
+        const InvItem = (item_, amount = 1) => {
+            let item = item_;
+            let count = amount;
+            
+             //Needed varibles
+            if(item == null){
+                throw new Error("Error: Item must not be " + item);
+            }
+            
+            return {
+                getName : () => {
+                    return item.getName();
+                },
+                getItem : () => {
+                    return item;
+                },
+                getCount : () => {
+                    return count;
+                }, 
+                add : (num = 1) => {
+                    count += num;
+                },
+                remove : (num = 1) => {
+                    count -= num;
+                }
+            }
+        };
             
         const Room = (name_, bkg_, initDesc_, exits_, morningDesc_, noonDesc_ = morningDesc_, eveningDesc_ = morningDesc_, nightDesc_ = morningDesc_,  isOutside_ = false, npcs_ = [], takeableItems_ = [], examinableItems_) =>{
             let hasSeen = false;
@@ -248,11 +264,13 @@
             }
         };
         
-        const Actor = (name_, startState_, cutOut_, states_ = [] ) => {
+        const Actor = (name_, startState_, cutOut_, states_ = [], inv = []) => {
             let name = name_;
-            let startState = startState_;
-            let cutOut = cutOut_;
-            let states = states_;
+            let startState = startState_;   //The initial state of the actor
+            let state = startState;         //current state
+            let cutOut = cutOut_;           //The sprite of the actor
+            let states = states_;           //The possible states of the actor
+            let inventory = inv;            //The actors inventory
             
             return{
                 getName: () => {
@@ -266,6 +284,173 @@
                 },
                 getStates: () => {
                     return states;
+                },
+                getInv: () => {
+                    return inv;
+                },
+                getItemCount: (item = null) => {
+                    if(item === null){ //Do not check item count if item is null
+                        console.log("Error: cannot get item count. Item is null"); 
+                        return;
+                    }
+                    for(let i : inventory){
+                        if(i.getItem() === item){
+                            return i.getCount();
+                        }
+                    }
+                    console.log("Error: actor does not have item ", item, " in their inventory");
+                },
+                addToInv: (item, amount = 1) => { 
+                    for(let i : inventory){
+                        if(i.getItem() === item){
+                            i.add(amount);
+                            return;
+                        }
+                    }
+                    inventory.push(InvItem(item, amount));
+                },
+                subFromInv: (item, amount = 1) => {
+                    for(let i : inventory){
+                        if(i.getItem() === item){
+                            i.remove(amount);
+                            if(i.getCount() <= 0){
+                                inventory.splice(inventory.indexOf(i), 1);
+                            }
+                            return;
+                        }
+                    }
+                    console.log("Error: item: ", item, " could not be subtracted from actor's inventory. " , "item: ", item, " does not exsist in actor's inventory.")
+                }
+            }
+        };
+
+        const Player = (name_, inv = []) => {
+             let name = name_;
+             let inventory = inv; 
+            
+            return {
+                getName: () => {
+                    return name;
+                },
+                getInv: () => {
+                    return inventory;
+                },
+                getItemCount: (item = null) => {
+                    if(item === null){ //Do not check item count if item is null
+                        console.log("Error: cannot get item count. Item is null"); 
+                        return;
+                    }
+                    for(let i : inventory){
+                        if(i.getItem() === item){
+                            return i.getCount();
+                        }
+                    }
+                    console.log("Error: player does not have item ", item, " in their inventory");
+                },
+                addToInv: (item, amount = 1) => { 
+                    let itemText;
+                    let actionLinks = '';
+                    
+                    //Fill in action links
+                    if (item.isEdible()) {
+                        actionLinks += '<a id=&quot;eat&quot; href=&quot;#&quot;>Eat</a><br>';
+                    }
+                    actionLinks += '<a id=&quot;examine&quot; href=&quot;javascript:examine(' + item.getId() + ')&quot;>Examine</a><br>';
+                    actionLinks += '<a d=&quot;drop&quot; href=&quot;javascript:dropItem(' + item.getId() + ')&quot;>Drop</a>';
+                    
+                    for(let i : inventory){
+                        if(i.getItem() === item){ //Item exsists in player inventory
+                            i.add(amount);
+                            itemText = "#" + item.getId() + " .itemText";
+                            $(itemText).text("" + item.getName() + " x " + i.getCount());
+                            return;
+                        }
+                    }
+                    //Item is not in inventory
+                    inventory.push(InvItem(item, amount));
+                    if(amount > 1){
+                        itemText = "" + item.getName() + " x " + amount; //Display item amount if greater than 1
+                    }
+                    else{
+                        itemText = item.getName();
+                    }
+                    $(".inv ul").append("<li id=\"" + item.getId() + "\"><a class='pop' data-content='" + actionLinks + "'  data-toggle='popover' href='#' title='' data-original-title rel='popover'><span class='itemText'>" + itemText + '</span></a></li>');
+                    //Set up popover for inventory item
+                    $(".pop").popover({
+                        trigger: "manual",
+                        html: true,
+                        animation: false,
+                        placement: 'right',
+                        container: 'body',
+                    })
+                    .on("mouseenter", function() {
+                        if(!talking){
+                        let _this = this;
+                        $(this).popover("show");
+                        $(".popover").on("mouseleave", function() {
+                            $(_this).popover('hide');
+                        });
+                    }
+                    }).on("mouseleave", function() {
+                        let _this = this;
+                        setTimeout(function() {
+                            if (!$(".popover:hover").length) {
+                                $(_this).popover("hide");
+                            }
+                        }, 30);
+                    });
+                    
+                    
+                    if (inventory.indexOf(this) === -1) { //If the item is not in inventory
+                        inventory.push(this);
+                        console.log(inventory);
+                        let itemText = name;
+                        if(invCount > 1){
+                            itemText = "" + name + " x " + invCount; //Display item amount if greater than 1
+                        }
+                        $(".inv ul").append("<li id=\"" + id + "\"><a class='pop' data-content='" + getInvLinks(id) + "'  data-toggle='popover' href='#' title='' data-original-title rel='popover'><span class='itemText'>" + itemText + '</span></a></li>');
+                        $(".pop").popover({
+                            trigger: "manual",
+                            html: true,
+                            animation: false,
+                            placement: 'right',
+                            container: 'body',
+                        })
+                        .on("mouseenter", function() {
+                            if(!talking){
+                            let _this = this;
+                            $(this).popover("show");
+                            $(".popover").on("mouseleave", function() {
+                                $(_this).popover('hide');
+                            });
+                            }
+                        }).on("mouseleave", function() {
+                            let _this = this;
+                            setTimeout(function() {
+                                if (!$(".popover:hover").length) {
+                                    $(_this).popover("hide");
+                                }
+                            }, 30);
+                        });
+                    }
+                    else {
+                        let str = "#" + id + " .itemText";
+                        $(str).text("" + name + " x " + invCount);
+                    }// /else
+                } // /add  
+                    },
+                    subFromInv: (item, amount = 1) => {
+                        for(let i : inventory){
+                            if(i.getItem() === item){
+                                i.remove(amount);
+                                if(i.getCount() <= 0){
+                                    inventory.splice(inventory.indexOf(i), 1);
+                                }
+                                return;
+                            }
+                        }
+                        console.log("Error: item: ", item, " could not be subtracted from actor's inventory. " , "item: ", item, " does not exsist in actor's inventory.")
+                    }
                 }
             }
         };
