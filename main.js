@@ -207,6 +207,8 @@
             let cutOut = cutOut_;           //The sprite of the actor
             let states = states_;           //The possible states of the actor
             let inventory = inv;            //The actors inventory
+            let currentRoom = currentRoom_; //The current room of the actor
+            let munny = munny_;             //The amount of munny on the actor
             
             return{
                 getName: () => {
@@ -227,7 +229,7 @@
                 getItemCount: (item = null) => {
                     if(item === null){ //Do not check item count if item is null
                         console.log("Error: cannot get item count. Item is null"); 
-                        return;
+                        return false;
                     }
                     for(let i of inventory){
                         if(i.getItem() === item){
@@ -235,12 +237,31 @@
                         }
                     }
                     console.log("Error: actor does not have item ", item, " in their inventory");
+                    return false;
+                },
+                getCurrentRoom: () => {
+                    return currentRoom;
+                },
+                getMunny: () => {
+                    return munny;
+                },
+                 setMunny: (amount = 0) => {
+                    munny = amount;
+                },
+                setCurrentRoom: (room = currentRoom) => {
+                    currentRoom = room;
+                },
+                addMunny: (amount = 1) => {
+                  munny += amount;  
+                },
+                subMunny: (amount = 1) => {
+                    munny -= amount;
                 },
                 addToInv: (item, amount = 1) => { 
                     for(let i of inventory){
                         if(i.getItem() === item){
                             i.add(amount);
-                            return;
+                            return true;
                         }
                     }
                     inventory.push(InvItem(item, amount));
@@ -252,21 +273,17 @@
                             if(i.getCount() <= 0){
                                 inventory.splice(inventory.indexOf(i), 1);
                             }
-                            return;
+                            return true;
                         }
                     }
                     console.log("Error: item: ", item, " could not be subtracted from actor's inventory. " , "item: ", item, " does not exsist in actor's inventory.")
+                    return false;
                 },
-                unequip: () => {
-                        //TODO
-                }, 
-                equip: () => {
-                        //TODO
-                }
+                
             }
         };
 
-        const Player = (name_, inv = [], currentRoom_, munny_ = 0, equipped_ = [], equipment_ = [], ingChest_ = []) => {
+        const Player = (name_, currentRoom_, munny_ = 0, inv = [], equipped_ = [], equipment_ = [], ingChest_ = []) => {
             let name = name_;
             let inventory = inv;
             let currentRoom = currentRoom_;
@@ -274,9 +291,11 @@
             let equipped = equipped_;
             let equipment = equipment_;
             let ingChest = ingChest_;
+            let isOutside = false;
+            let talking = false;
+            let interaction = null;
+            let interactingWith = null;
      
-            
-            
             return {
                 getName: () => {
                     return name;
@@ -299,10 +318,13 @@
                 getIngChest: () => {
                     return ingChest;
                 },
+                getInteractingWith: () => {
+                    return interactingWith;
+                },
                 getItemCount: (item = null) => {
                     if(item === null){ //Do not check item count if item is null
                         console.log("Error: cannot get item count. Item is null"); 
-                        return;
+                        return false;
                     }
                     for(let i of inventory){
                         if(i.getItem() === item){
@@ -310,6 +332,18 @@
                         }
                     }
                     console.log("Error: player does not have item ", item, " in their inventory");
+                },
+                isOutside: () => {
+                    return isOutside;
+                },
+                isTalking: () => {
+                    return talking;
+                },
+                updateOutsideFlag: () => {
+                    isOutside = currentRoom.isOutside();
+                },
+                setTalking: (bool) => {
+                    talking = bool;
                 },
                 setMunny: (amount = 0) => {
                     munny = amount;
@@ -319,6 +353,25 @@
                 }, 
                 setCurrentRoom: (room = currentRoom) => {
                     currentRoom = room;
+                },
+                startInteraction: (actor = null, action = null) => {
+                    if(actor === null || action === null){
+                        console.log("Error: player cannot start interaction. Both actor and action must be specified.");
+                        return false;
+                    }
+                    else{
+                        interactingWith = actor;
+                        
+                        switch(action){
+                            case "talking": setTalking(true); interaction = "talking"; break; 
+                            default: console.log("Error: cannot start interaction. ", action, " does not exist."); return false; 
+                        }
+                    }
+                },
+                stopInteraction: () => {
+                    interactingWith = null;
+                    interaction = null;
+                    settalking(false);
                 },
                 addMunny: (amount = 1) => {
                   munny += amount;  
@@ -357,10 +410,11 @@
                                 itemText = "#" + id + " .itemText";
                                 $(itemText).text("" + item.getName() + " x " + i.getCount());
                             }
-                            return;
+                            return true;
                         }
                     }
                     console.log("Error: item: ", item, " could not be subtracted from actor's inventory. " , "item: ", item, " does not exsist in actor's inventory.");
+                    return false;
                     }
                 },
                 addToInv: (item, amount = 1) => { 
@@ -372,7 +426,7 @@
                         equipment.push(item);
                     }
                     else if(item.getType() == "ing"){
-                        ingChest.push(item)
+                        ingChest.push(item);
                     }
                     else{
 
@@ -388,7 +442,7 @@
                                 i.add(amount);
                                 itemText = "#" + item.getId() + " .itemText";
                                 $(itemText).text("" + item.getName() + " x " + i.getCount());
-                                return;
+                                return true;
                             }
                         }
                         //Item is not in inventory
@@ -425,16 +479,66 @@
                             }, 30);
                         });
                     }
+                },
+                unequip: (item = null) => {
+                    if(item == null){
+                        console.log("Error: Cannot unequip item. It is ", item);
+                        return false; //Do not continue if item is equal to null
+                    }
+                    
+                    if(equipped.getIndex(item) != -1){ //Item is currently equipped
+                        equipped.splice(equipped.getIndex(item), 1); //Remove item from list of equipped items
+                        return true;
+                    }
+                    console.log(item, " is not currently equipped.");
+                }, 
+                equip: (item = null) => {
+                    if(item == null){
+                        console.log("Error: Cannot equip item. It is ", item);
+                        return false; //Do not continue if item is equal to null
+                    }
+                    
+                    if(equipped.getIndex(item) != -1){ //Item is currently equipped
+                       console.log("Error: cannot equip. ", item, " is already equipped.");
+                       return false;
+                    }
+                    equipped.push(item); //place item in list of equipped items
                 }
             }
         };
         
-        const State = (pages_) => {
+        const State = (pages_ = ["Error: this is a blank page. This state has no pages in it."]) => {
             let pages = pages_;
+            let currentPage = 0;
             
             return{
                 getPages: () => {
                     return pages;
+                },
+                getCurrentPage: () => {
+                    return currentPage;
+                },
+                readPage: () => {
+                    return pages[currentPage];
+                },
+                setCurrentPage: (page) => {
+                    currentPage = page;
+                },
+                pageFwd: () => {
+                    if(currentPage != pages.length-1){ //Dont move page foward if it is last page
+                        currentPage++;
+                        return true;
+                    }
+                    console.log("Error: cannot go to the next page. It is the last page in the state.");
+                    return false;
+                },
+                pagePev: () => {
+                    if(currentPage != 0){ //Dont move page foward if it is first page
+                        currentPage--;
+                        return true;
+                    }
+                    console.log("Error: cannot go to the previous page. It is the first page in the state.");
+                    return false;
                 }
             }
         };
@@ -442,22 +546,19 @@
         
         let clock = 600;
         let timeOfDay = "morning";
-        let rate = 0.5;
+        const let rate = 0.5;
         let turns = 0;
-        let isOutside = false;
-        let N = "North";
-        let S = "South";
-        let E = "East";
-        let W = "West";
-        let NE = "NorthEast";
-        let NW = "NorthWest";
-        let SE = "SouthEast";
-        let SW = "SouthWest";
+        const let N = "North";
+        const let S = "South";
+        const let E = "East";
+        const let W = "West";
+        const let NE = "NorthEast";
+        const let NW = "NorthWest";
+        const let SE = "SouthEast";
+        const let SW = "SouthWest";
         let ingShopCat = [];
         let resizeToggle = false;
-        let talking = false;
-        let state;
-        let currentPage = 0;
+        let player;
         /********** Functions ***********/
         /* Handle Room as it appears on the page*/
         const updateRoomName = (name) => {
@@ -484,7 +585,8 @@
             }
         };
         const addActionsBasedOnCurrRoom = () => {
-            if(!talking){
+            let currentRoom = player.getCurrentRoom();
+            if(!player.istalking()){
                 if (typeof currentRoom.getNpcs() != "undefined" && currentRoom.getNpcs() !== null && currentRoom.getNpcs().length > 0) {
                     $(".action ul").append('<li id="talk"><a href="#">Talk To</li>');
                 }
@@ -509,6 +611,7 @@
         };
         
         const displayItemsInRoom = () => {
+            let currentRoom = player.getCurrentRoom();
             if (currentRoom.getTakeableItems() != null && currentRoom.getTakeableItems().length > 0) {
                 for (let i of currentRoom.getTakeableItems()) {
                     addText('\n <span class="inTextBox" id="' + i.getId() + '">' + i.igetInRoomDesc() + "</span>");
@@ -517,14 +620,11 @@
         };
         //based on current room, proper room connecter
         const changeRoom = (exit) => {
+            let currentRoom = player.getCurrentRoom();
             takeTurn();
             $(".main").css("background", "url(" + currentRoom.getBkg() + ") center center/ cover no-repeat ");
             //Is the player outside?
-            if (currentRoom.isOutside()) {
-                isOutside = true;
-            }
-            else
-                isOutside = false;
+             player.updateOutsideFlag();
             currentRoom.setSavedText([]);
             refreshRoom(exit);
             if(!currentRoom.getHasSeen())
@@ -532,6 +632,7 @@
         };
         //only to refresh the room's state
         const refreshRoom = (exit) => {
+            let currentRoom = player.getCurrentRoom();
             flushTextBox();
             updateRoomName(currentRoom.getName());
             if (exit != null) {
@@ -552,10 +653,13 @@
             $(".action ul").empty();
             addActionsBasedOnCurrRoom();
         };
+
         /* Inventory*/
 
         //fix string
         const dropItem = (item) => {
+            let inventory = player.getInv();
+            let currentRoom = player.getCurrentRoom();
             for (let i of inventory) {
                 if (i.getId() == item) {
                     i.remove();
@@ -570,11 +674,10 @@
             }
         };
         const takeItem = (item) => {
-            if(item.getType() == "equip")
-                equipment.push(item);
-            else
-                item.add();
+            let currentRoom = player.getCurrentRoom();
             let index = currentRoom.getTakeableItems().indexOf(item);
+            
+            player.addInv(item);
             if (index != -1) {
                 currentRoom.getTakeableItems().splice(index, 1);
             }
@@ -583,30 +686,7 @@
             str = "#" + item.getId() + ".takeable";
             $(str).remove();
         };
-        const getInvLinks = (id) => {
-            let obj = null;
-            for (let o of inventory) {
-                if (o.getId() === id) {
-                    obj = o;
-                }
-            }
-            let str = '';
-            if (obj.isEdible()) {
-                str += '<a id=&quot;eat&quot; href=&quot;#&quot;>Eat</a><br>';
-            }
-            str += '<a id=&quot;examine&quot; href=&quot;javascript:examine(' + obj.getId() + ')&quot;>Examine</a><br>';
-            str += '<a d=&quot;drop&quot; href=&quot;javascript:dropItem(' + obj.getId() + ')&quot;>Drop</a>';
-            return str;
-        };
-        /* Munny */
-        const addMunny = (amount) => {
-            munny += amount;
-            $(".munny").text(munny);
-        };
-        const subMunny = (amount) => {
-            munny -= amount;
-            $(".munny").text(munny);
-        };
+
         /* Back Action */
         const menuBack = () => {
             $(".action ul").empty();
@@ -745,6 +825,7 @@
         /* Journal Inventory */
         
         const loadInvMenu = () => {
+            let inventory = player.getInv();
             $("#invTable").append("<tr><th>Name</th><th>Value</th><th>Amount</th><th>Total Value</th></tr>")
             for (let i of inventory) {    
                 let total = i.getInvCount() * i.getValue();
@@ -803,7 +884,7 @@
                             sel = "#shoesE"; 
                             sel2 = "#playerShoes";
                             break;
-                        default: console.log("Error: No equipable subtype for item");
+                        default: console.log("Error: No equippable subtype for item");
                     }
                     console.log("sel= "+sel);
                     $(sel).empty();
@@ -826,6 +907,7 @@
         
         
         const loadEquipment = () => {
+            let equipment = player.getEquipment();
             let eLength = equipment.length;
             $('#equipmentChest').children().each(function(index, item) {
                 if(eLength == 0)
@@ -838,6 +920,7 @@
         };
         
         const equipDisplayInfo = (id) => {
+            let equipment = player.getEquipment();
             for(let i of equipment){
                 if(i.getId() == id){
                     $('#equipInfo').empty();
@@ -848,6 +931,7 @@
         
         /* Talking */
         const toggleTalk = (actor) => {
+            let talking = player.isTalking();
             $(".bottomOfScreen").attr('id', ($(".bottomOfScreen").attr('id') == 'bottomText' ? 'talkingText' : 'bottomText'));
             $("#playerAvatar").toggle();
             $("#resizeBtn").toggle();
@@ -866,7 +950,6 @@
                 $(".textBox").css("top", "");
             }
             else{
-                talking = false;
                 $("#npcCutOut").empty();
                 $(".textBox").css("font-size", "18px");
                 if(!resizeToggle)
@@ -879,9 +962,11 @@
         }
         
         const turnPageFwd = () => {
+            let state = player.getInteractingWith().getCurrentState();
+            let currentPage = player.getInteractingWith().getCurrentState().getCurrentPage();
             if(currentPage < state.getPages().length){
-                currentPage++;
-                $(".textBox").text(state.getPages()[currentPage]);
+                state.pageFwd();
+                $(".textBox").text(state.readPage());
             }
             if(currentPage == state.getPages().length - 1){
                 removeAction("next");
@@ -895,9 +980,11 @@
         }
         
         const turnPagePre = function(){
+            let state = player.getInteractingWith().getCurrentState();
+            let currentPage = player.getInteractingWith().getCurrentState().getCurrentPage();
             if(currentPage > 0){
-                currentPage--;
-                $(".textBox").text(state.getPages()[currentPage]);
+                state.pagePev();
+                $(".textBox").text(state.readPage());
             }
             if(currentPage == 0){
                 removeAction("prev");
@@ -1069,9 +1156,9 @@
         
         const enterName = () => {
                  if($('#nameterm').val() != ''){
-                    name = $("#nameterm").val();
+                    let name = $("#nameterm").val();
                     $("#startNewGame").toggle();
-                    startGameInit();
+                    startGameInit(name);
                     $("#roam").toggle();
                 }
                 else{
@@ -1107,17 +1194,16 @@
             //$("#mainMenu").toggle();
             $("#startNewGame").toggle();
             $("#nameBox").toggle(); 
-            addMunny(100);
-            currentRoom = bedRoom;
-            changeRoom();
-            currentRoom.hasSeen = false;
-            equipment.push(brownShirt);
-            equipment.push(blueSkirt);            
+            changeRoom();            
         }
         const roamInit = () => {
-            $(".Playername").text(name);
+            $(".Playername").text(player.getName());
         }
-        const startGameInit = () => {
+        const startGameInit = (name) => {
+            player = Player(name, bedRoom, 100);
+            player.getCurrentRoom().hasSeen() = false;
+            player.addInv(brownShirt);
+            player.addInv(blueSkirt);
             roamInit();
             state = AierithIntro;
             toggleTalk(Aierith);
