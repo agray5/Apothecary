@@ -179,11 +179,7 @@
                     else
                         exits = e;
                 }
-                
             }
-            
-            
-        
         };
         
         const Exit = (dir_, nextRoom_, exitMsg_ = null) => {
@@ -260,6 +256,12 @@
                         }
                     }
                     console.log("Error: item: ", item, " could not be subtracted from actor's inventory. " , "item: ", item, " does not exsist in actor's inventory.")
+                },
+                unequip: () => {
+                        //TODO
+                }, 
+                equip: () => {
+                        //TODO
                 }
             }
         };
@@ -330,11 +332,11 @@
                     if(item.getType() == "equip"){
                         equipment.splice(equipment.indexOf(item), 1);
                         if(equipped.indexOf(item) != -1){
-                            
+                            unequip(item);
                         }
                     }
                     else if(item.getType() == "ing"){
-                        ingChest.push(item)
+                        ingChest.splice(ingChest.indexOf(item), 1);
                     }
                     else{
                     
@@ -359,6 +361,7 @@
                         }
                     }
                     console.log("Error: item: ", item, " could not be subtracted from actor's inventory. " , "item: ", item, " does not exsist in actor's inventory.");
+                    }
                 },
                 addToInv: (item, amount = 1) => { 
                     let itemText;
@@ -421,58 +424,6 @@
                                 }
                             }, 30);
                         });
-
-
-                        if (inventory.indexOf(this) === -1) { //If the item is not in inventory
-                            inventory.push(this);
-                            console.log(inventory);
-                            let itemText = name;
-                            if(invCount > 1){
-                                itemText = "" + name + " x " + invCount; //Display item amount if greater than 1
-                            }
-                            $(".inv ul").append("<li id=\"" + id + "\"><a class='pop' data-content='" + getInvLinks(id) + "'  data-toggle='popover' href='#' title='' data-original-title rel='popover'><span class='itemText'>" + itemText + '</span></a></li>');
-                            $(".pop").popover({
-                                trigger: "manual",
-                                html: true,
-                                animation: false,
-                                placement: 'right',
-                                container: 'body',
-                            })
-                            .on("mouseenter", function() {
-                                if(!talking){
-                                let _this = this;
-                                $(this).popover("show");
-                                $(".popover").on("mouseleave", function() {
-                                    $(_this).popover('hide');
-                                });
-                                }
-                            }).on("mouseleave", function() {
-                                let _this = this;
-                                setTimeout(function() {
-                                    if (!$(".popover:hover").length) {
-                                        $(_this).popover("hide");
-                                    }
-                                }, 30);
-                            });
-                        }
-                        else {
-                            let str = "#" + id + " .itemText";
-                            $(str).text("" + name + " x " + invCount);
-                        }// /else
-                    } // /add  
-                        },
-                        subFromInv: (item, amount = 1) => {
-                            for(let i of inventory){
-                                if(i.getItem() === item){
-                                    i.remove(amount);
-                                    if(i.getCount() <= 0){
-                                        inventory.splice(inventory.indexOf(i), 1);
-                                    }
-                                    return;
-                                }
-                            }
-                            console.log("Error: item: ", item, " could not be subtracted from actor's inventory. " , "item: ", item, " does not exsist in actor's inventory.")
-                        }
                     }
                 }
             }
