@@ -264,9 +264,16 @@
             }
         };
 
-        const Player = (name_, inv = []) => {
-             let name = name_;
-             let inventory = inv; 
+        const Player = (name_, inv = [], currentRoom_, munny_ = 0, equipped_ = [], equipment_ = [], ingChest_ = []) => {
+            let name = name_;
+            let inventory = inv;
+            let currentRoom = currentRoom_;
+            let munny = munny_;
+            let equipped = equipped_;
+            let equipment = equipment_;
+            let ingChest = ingChest_;
+     
+            
             
             return {
                 getName: () => {
@@ -274,6 +281,21 @@
                 },
                 getInv: () => {
                     return inventory;
+                },
+                getCurrentRoom: () => {
+                    return currentRoom;
+                },
+                getMunny: () => {
+                    return munny;
+                },
+                getEquipped: () => {
+                    return equipped;
+                },
+                getEquipment: () => {
+                    return equipment
+                }, 
+                getIngChest: () => {
+                    return ingChest;
                 },
                 getItemCount: (item = null) => {
                     if(item === null){ //Do not check item count if item is null
@@ -287,8 +309,34 @@
                     }
                     console.log("Error: player does not have item ", item, " in their inventory");
                 },
+                setMunny: (amount = 0) => {
+                    munny = amount;
+                },
+                setEquipped: (equip = []) => {
+                    equipped = equip;
+                }, 
+                setCurrentRoom: (room = currentRoom) => {
+                    currentRoom = room;
+                },
+                addMunny: (amount = 1) => {
+                  munny += amount;  
+                },
+                subMunny: (amount = 1) => {
+                    munny -= amount;
+                },
                 subFromInv: (item, amount = 1) => {
                     let itemText;
+                    
+                    if(item.getType() == "equip"){
+                        equipment.splice(equipment.indexOf(item), 1);
+                        if(equipped.indexOf(item) != -1){
+                            
+                        }
+                    }
+                    else if(item.getType() == "ing"){
+                        ingChest.push(item)
+                    }
+                    else{
                     
                     for(let i of inventory){
                         if(i.getItem() === item){ //Item is in inventory
@@ -316,64 +364,40 @@
                     let itemText;
                     let actionLinks = '';
                     
-                    //Fill in action links
-                    if (item.isEdible()) {
-                        actionLinks += '<a id=&quot;eat&quot; href=&quot;#&quot;>Eat</a><br>';
+                    //Check if item is a equipment or an ingrediant 
+                    if(item.getType() == "equip"){
+                        equipment.push(item);
                     }
-                    actionLinks += '<a id=&quot;examine&quot; href=&quot;javascript:examine(' + item.getId() + ')&quot;>Examine</a><br>';
-                    actionLinks += '<a d=&quot;drop&quot; href=&quot;javascript:dropItem(' + item.getId() + ')&quot;>Drop</a>';
-                    
-                    for(let i of inventory){
-                        if(i.getItem() === item){ //Item exsists in player inventory
-                            i.add(amount);
-                            itemText = "#" + item.getId() + " .itemText";
-                            $(itemText).text("" + item.getName() + " x " + i.getCount());
-                            return;
-                        }
-                    }
-                    //Item is not in inventory
-                    inventory.push(InvItem(item, amount));
-                    if(amount > 1){
-                        itemText = "" + item.getName() + " x " + amount; //Display item amount if greater than 1
+                    else if(item.getType() == "ing"){
+                        ingChest.push(item)
                     }
                     else{
-                        itemText = item.getName();
-                    }
-                    $(".inv ul").append("<li id=\"" + item.getId() + "\"><a class='pop' data-content='" + actionLinks + "'  data-toggle='popover' href='#' title='' data-original-title rel='popover'><span class='itemText'>" + itemText + '</span></a></li>');
-                    //Set up popover for inventory item
-                    $(".pop").popover({
-                        trigger: "manual",
-                        html: true,
-                        animation: false,
-                        placement: 'right',
-                        container: 'body',
-                    })
-                    .on("mouseenter", function() {
-                        if(!talking){
-                        let _this = this;
-                        $(this).popover("show");
-                        $(".popover").on("mouseleave", function() {
-                            $(_this).popover('hide');
-                        });
-                    }
-                    }).on("mouseleave", function() {
-                        let _this = this;
-                        setTimeout(function() {
-                            if (!$(".popover:hover").length) {
-                                $(_this).popover("hide");
-                            }
-                        }, 30);
-                    });
-                    
-                    
-                    if (inventory.indexOf(this) === -1) { //If the item is not in inventory
-                        inventory.push(this);
-                        console.log(inventory);
-                        let itemText = name;
-                        if(invCount > 1){
-                            itemText = "" + name + " x " + invCount; //Display item amount if greater than 1
+
+                        //Fill in action links
+                        if (item.isEdible()) {
+                            actionLinks += '<a id=&quot;eat&quot; href=&quot;#&quot;>Eat</a><br>';
                         }
-                        $(".inv ul").append("<li id=\"" + id + "\"><a class='pop' data-content='" + getInvLinks(id) + "'  data-toggle='popover' href='#' title='' data-original-title rel='popover'><span class='itemText'>" + itemText + '</span></a></li>');
+                        actionLinks += '<a id=&quot;examine&quot; href=&quot;javascript:examine(' + item.getId() + ')&quot;>Examine</a><br>';
+                        actionLinks += '<a d=&quot;drop&quot; href=&quot;javascript:dropItem(' + item.getId() + ')&quot;>Drop</a>';
+
+                        for(let i of inventory){
+                            if(i.getItem() === item){ //Item exsists in player inventory
+                                i.add(amount);
+                                itemText = "#" + item.getId() + " .itemText";
+                                $(itemText).text("" + item.getName() + " x " + i.getCount());
+                                return;
+                            }
+                        }
+                        //Item is not in inventory
+                        inventory.push(InvItem(item, amount));
+                        if(amount > 1){
+                            itemText = "" + item.getName() + " x " + amount; //Display item amount if greater than 1
+                        }
+                        else{
+                            itemText = item.getName();
+                        }
+                        $(".inv ul").append("<li id=\"" + item.getId() + "\"><a class='pop' data-content='" + actionLinks + "'  data-toggle='popover' href='#' title='' data-original-title rel='popover'><span class='itemText'>" + itemText + '</span></a></li>');
+                        //Set up popover for inventory item
                         $(".pop").popover({
                             trigger: "manual",
                             html: true,
@@ -388,7 +412,7 @@
                             $(".popover").on("mouseleave", function() {
                                 $(_this).popover('hide');
                             });
-                            }
+                        }
                         }).on("mouseleave", function() {
                             let _this = this;
                             setTimeout(function() {
@@ -397,24 +421,58 @@
                                 }
                             }, 30);
                         });
-                    }
-                    else {
-                        let str = "#" + id + " .itemText";
-                        $(str).text("" + name + " x " + invCount);
-                    }// /else
-                } // /add  
-                    },
-                    subFromInv: (item, amount = 1) => {
-                        for(let i of inventory){
-                            if(i.getItem() === item){
-                                i.remove(amount);
-                                if(i.getCount() <= 0){
-                                    inventory.splice(inventory.indexOf(i), 1);
-                                }
-                                return;
+
+
+                        if (inventory.indexOf(this) === -1) { //If the item is not in inventory
+                            inventory.push(this);
+                            console.log(inventory);
+                            let itemText = name;
+                            if(invCount > 1){
+                                itemText = "" + name + " x " + invCount; //Display item amount if greater than 1
                             }
+                            $(".inv ul").append("<li id=\"" + id + "\"><a class='pop' data-content='" + getInvLinks(id) + "'  data-toggle='popover' href='#' title='' data-original-title rel='popover'><span class='itemText'>" + itemText + '</span></a></li>');
+                            $(".pop").popover({
+                                trigger: "manual",
+                                html: true,
+                                animation: false,
+                                placement: 'right',
+                                container: 'body',
+                            })
+                            .on("mouseenter", function() {
+                                if(!talking){
+                                let _this = this;
+                                $(this).popover("show");
+                                $(".popover").on("mouseleave", function() {
+                                    $(_this).popover('hide');
+                                });
+                                }
+                            }).on("mouseleave", function() {
+                                let _this = this;
+                                setTimeout(function() {
+                                    if (!$(".popover:hover").length) {
+                                        $(_this).popover("hide");
+                                    }
+                                }, 30);
+                            });
                         }
-                        console.log("Error: item: ", item, " could not be subtracted from actor's inventory. " , "item: ", item, " does not exsist in actor's inventory.")
+                        else {
+                            let str = "#" + id + " .itemText";
+                            $(str).text("" + name + " x " + invCount);
+                        }// /else
+                    } // /add  
+                        },
+                        subFromInv: (item, amount = 1) => {
+                            for(let i of inventory){
+                                if(i.getItem() === item){
+                                    i.remove(amount);
+                                    if(i.getCount() <= 0){
+                                        inventory.splice(inventory.indexOf(i), 1);
+                                    }
+                                    return;
+                                }
+                            }
+                            console.log("Error: item: ", item, " could not be subtracted from actor's inventory. " , "item: ", item, " does not exsist in actor's inventory.")
+                        }
                     }
                 }
             }
@@ -430,15 +488,7 @@
             }
         };
         /********** Varibles ***********/
-        let name = "Megiath";
-        let gender = "female";
-        //holds inventory items
-        let inventory = [];
-        let ingChest = [];
-        let equipped = [];
-        let equipment = [];
-        let currentRoom;
-        let munny = 0;
+        
         let clock = 600;
         let timeOfDay = "morning";
         let rate = 0.5;
