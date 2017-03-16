@@ -15,220 +15,229 @@
 	</script>
 </head>
 <body>
-	<div id="roam">
-		<div class="inv">
-			Inventory
-			<ul>
-				<li></li>
-			</ul>
-		</div>
-		<div class="main">
-			<h1><span id="roomName">Room Name</span></h1>
-			<ul class="exit"></ul>
-			<div id="npcCutOut"></div>
-			<div class="bottomOfScreen" id="bottomText">
-				<div id="nameBox"><span id="nameBoxText">Name</span></div>
-				<div class="textBox">
-					<div class="left" id="playerAvatar"><img src="img/playerBase.png" alt="player base"></div>
-					<br>
-					<span id="text">text</span>
-				</div>	
-					<span class="glyphicon glyphicon-resize-full" id="resizeBtn"></span>
-			</div>
-			<div class="action">
-					<ul >
-						<li>
-							<a href="#">Action 1</a>
-						</li>
-						<li>
-							<a href="#">Action 2</a>
-						</li>
-					</ul>
-				</div>
-		</div>
-		<div class="info">
-			<ul>
-				<li>Name: <span class="Playername">Aeith</span></li>
-				<li>Munny: <span class="munny">0</span></li>
-				<li>Time: <span id="time">Morning</span></li>
-				<li>
-					<a href="#" onclick="openJournal()">Journal</a>
-				</li>
-			</ul>
-		</div>
-	</div>
-	<div id="ingShop">
-		<div class="ingBackground"></div>
-		<div id="ingShopBorder">
-			<div class="borderM" id="buyM">
-				<div class="buym_">
-					Buy
-				</div>
-				<div class="buym_">
-					Sell
-				</div>
-				<div class="buym_" id="buy_exit">
-					Exit
-				</div>
-			</div>
-			<div class="borderM" id="munM">
-				<span class="munny">0</span> <span class="emph">M</span>
-			</div>
-			<div class="borderM" id="shopM">
-				<table id="buyTable"></table><span id="buyTotalText">Total: <span id=
-				"buyTotalAmount">0</span><button class="myBtn" id=
-				"IngBuyButton">Buy</button></span>
-			</div>
-			<div class="borderM" id="infoM">
-				Info
-			</div>
-		</div>
-	</div>
-	<div class="overlay" id="journal">
-		<div class="ribbon">
-			<a class="closebtn" href="javascript:void(0)" onclick=
-			"closeJournal()">&times;</a>
-		</div>
-		<div class="journal-content">
-			<div id="jOptions">
-				<ul class="tab">
-					<li class="ribbonHoz">
-						<a class="tablinks" href="javascript:void(0)" id="defaultOpen" onclick=
-						"openTab('Equipment')"><span class="content">Equipment</span></a>
-					</li>
-					<li class="ribbonHoz">
-						<a class="tablinks" href="javascript:void(0)" onclick=
-						"openTab('Inventory')"><span class="content">Inventory</span></a>
-					</li>
-					<li class="ribbonHoz">
-						<a class="tablinks" href="javascript:void(0)" onclick=
-						"openTab('Ingredients')"><span class="content">Ingredients</span></a>
-					</li>
-					<li class="ribbonHoz">
-						<a class="tablinks" href="javascript:void(0)" onclick=
-						"openTab('Recipes')"><span class="content">Recipes</span></a>
-					</li>
-				</ul>
-			</div>
-			<div id="jContent">
-				<div class="tabcontent" id="Equipment">
-					<h3 style="margin-bottom: 10px;">Equipment</h3>
-					<div class="left" id="equipmentChest">
-						<div></div>
-						<div></div>
-						<div></div>
-						<div></div>
-						<div></div>
-						<div></div>
-						<div></div>
-						<div></div>
-						<div></div>
-						<div></div>
-						<div></div>
-						<div></div>
-					</div>
-					<div class="vcontainer right">
-						<div id="playerEquipped">
-							<div class="vcontainer">
-								<div class="equippedBox" id="shirtE">
-									shirt
-								</div>
-								<div class="equippedBox" id="handLE">
-									left hand
-								</div>
-								<div class="equippedBox" id="hatE">
-									hat
-								</div>
-							</div>
-							<div class="vcontainer">
-								<div id="playerBase">
-									<img src="img/playerBase.png" alt="player base">
-									<div id="playerHat"></div>
-									<div id="playerShirt"></div>
-									<div id="playerHandL"></div>
-									<div id="playerPants"></div>
-									<div id="playerHandR"></div>
-									<div id="playerShoes"></div>
-								</div>
-							</div>
-							<div class="vcontainer">
-								<div class="equippedBox" id="pantsE">
-									pants
-								</div>
-								<div class="equippedBox" id="handRE">
-									right hand
-								</div>
-								<div class="equippedBox" id="shoesE">
-									shoes
-								</div>
-							</div>
-						</div>
-						<div class="borderM" id="equipInfo">
-							Info
-						</div>
-					</div>
-					<div class="clearfix"></div>
-				</div>
-				<div class="tabcontent" id="Inventory">
-					<h3>Inventory</h3>
-					<table id="invTable"></table>
-				</div>
-				<div class="tabcontent" id="Ingredients">
-					<h3>London</h3>
-					<p>London is the capital city of England.</p>
-				</div>
-				<div class="tabcontent" id="Recipes">
-					<h3>Recipes</h3>
-					<div class="arrow-left" id="recL"></div>
-					<div id="recipeInfo">
-						<div class="equippedBox" id="recIcon"><!-- Replace Image --><img height=
-						"150px" src="img/potion.png" width="150px" alt="potion"></div><span id="recName">Basic
-						Health Potion</span><br>
-						<br>
-						<span style="color:gold; margin-left: 5px">Base Value:</span> <span id=
-						"recValue">10</span> <span style="color:gold">Mun</span>
-					</div>
-					<div id="recipeDisplay">
-						<span id="recDesc">I am the potion description such as: weak healing
-						potion with mild stamina regen effect.</span>
-						<h4 style="color:gold;">Favorite of:</h4>
-						<ul id="recFav">
-							<li><img src="img/char.jpg" alt="customer">Asuno</li>
-							<li><img src="img/garra.jpg" alt="customer">Gaara</li>
-						</ul>
-					</div>
-					<div class="arrow-right" id="recR"></div>
-				</div>
-			</div>
-		</div>
-	</div>
-	<div id="mainMenu">
-		<!--<img src="img/m.jpg" width="100%" height="100%" id="bkgImg">-->
-		<div id="mainBtnContainer"> 
-			<span class="cBtn" id="NewGameBtn"> New Game </span>
-			<span class="cBtn" id="LoadGameBtn"> Load Game </span>
-			<span class="cBtn" id="OptionsBtn"> Options </span>
-			<span class="cBtn" id="CreditsBtn"> Credits </span>
-		</div>
-	</div>
-	<div id="startNewGame">
-		<div id="newGameBoard">
-			<span id="newGameText">New Game</span>
-			<div id="boardPaper">
-				<span class="textWBkg" style="top: 50px"><br>Welcome to the demo of Apothecary. Art assets are not final and most are likely to change.</span>
-				<span class="textWBkg"><br>For years you had trained with the local herbalist learning to create a wide array of medicines. They were training you to become the next village 
-				healer, but it soon became clear that you were gifted in both brewing potions and mixing medical herbs. Over the years word spread of your medicine's potency and many would travel miles for your aid.
-				News of your works spread as far as the capital. One day the royal guard showed in your home village and "requested" that you move to the castle in the capital, so that your services could be put to use there. 
-				You said your goodbyes to your family, feeling a mix of emotions, and headed out with the guard toward your new home.
-				</span>
-				<span class="textWBkg" style="top: 150px; float: left;">Player Name: </span>
-				<div class="field" id="nameform"> 
-					<input type="text" id="nameterm" placeholder="Name" />
-					<button type="button" id="nameEnter">Enter</button>
-				</div>
-			</div>
-		</div>
-	</div>
+    <div id="content">
+        <div id="roam">
+            <div class="inv">
+                Inventory
+                <ul>
+                    <li></li>
+                </ul>
+            </div>
+            <div class="main">
+                <h1><span id="roomName">Room Name</span></h1>
+                <ul class="exit"></ul>
+                <div id="npcCutOut"></div>
+                <div class="bottomOfScreen" id="bottomText">
+                    <div id="nameBox"><span id="nameBoxText">Name</span></div>
+                    <div class="textBox">
+                        <div class="left" id="playerAvatar"><img src="img/playerBase.png" alt="player base"></div>
+                        <br>
+                        <span id="text">text</span>
+                    </div>	
+                        <span class="glyphicon glyphicon-resize-full" id="resizeBtn"></span>
+                </div>
+                <div class="action">
+                        <ul >
+                            <li>
+                                <a href="#">Action 1</a>
+                            </li>
+                            <li>
+                                <a href="#">Action 2</a>
+                            </li>
+                        </ul>
+                    </div>
+            </div>
+            <div class="info">
+                <ul>
+                    <li>Name: <span class="Playername">Aeith</span></li>
+                    <li>Munny: <span class="munny">0</span></li>
+                    <li>Time: <span id="time">Morning</span></li>
+                    <li>
+                        <a href="#" onclick="openJournal()">Journal</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div id="shop">
+            <div class="ingBackground"></div>
+            <div id="ingShopBorder">
+                <div class="borderM" id="buyM">
+                    <div class="buym_">
+                        Buy
+                    </div>
+                    <div class="buym_">
+                        Sell
+                    </div>
+                    <div class="buym_" id="buy_exit">
+                        Exit
+                    </div>
+                </div>
+                <div class="borderM" id="munM">
+                    <span class="munny">0</span> <span class="emph">M</span>
+                </div>
+                <div class="borderM" id="shopM">
+                    <table id="buyTable"></table><span id="buyTotalText">Total: <span id=
+                    "buyTotalAmount">0</span><button class="myBtn" id=
+                    "buyButton">Buy</button></span>
+                </div>
+                <div class="borderM" id="infoM">
+                    Info
+                </div>
+            </div>
+        </div>
+        <div class="overlay" id="journal">
+            <div class="ribbon">
+                <a class="closebtn" href="javascript:void(0)" onclick=
+                "closeJournal()">&times;</a>
+            </div>
+            <div class="journal-content">
+                <div id="jOptions">
+                    <ul class="tab">
+                        <li class="ribbonHoz">
+                            <a class="tablinks" href="javascript:void(0)" id="defaultOpen" onclick=
+                            "openTab('Equipment')"><span class="content">Equipment</span></a>
+                        </li>
+                        <li class="ribbonHoz">
+                            <a class="tablinks" href="javascript:void(0)" onclick=
+                            "openTab('Inventory')"><span class="content">Inventory</span></a>
+                        </li>
+                        <li class="ribbonHoz">
+                            <a class="tablinks" href="javascript:void(0)" onclick=
+                            "openTab('Ingredients')"><span class="content">Ingredients</span></a>
+                        </li>
+                        <li class="ribbonHoz">
+                            <a class="tablinks" href="javascript:void(0)" onclick=
+                            "openTab('Recipes')"><span class="content">Recipes</span></a>
+                        </li>
+                    </ul>
+                </div>
+                <div id="jContent">
+                    <div class="tabcontent" id="Equipment">
+                        <h3 style="margin-bottom: 10px;">Equipment</h3>
+                        <div class="left" id="equipmentChest">
+                            <div></div>
+                            <div></div>
+                            <div></div>
+                            <div></div>
+                            <div></div>
+                            <div></div>
+                            <div></div>
+                            <div></div>
+                            <div></div>
+                            <div></div>
+                            <div></div>
+                            <div></div>
+                        </div>
+                        <div class="vcontainer right">
+                            <div id="playerEquipped">
+                                <div class="vcontainer">
+                                    <div class="equippedBox" id="shirtE">
+                                        shirt
+                                    </div>
+                                    <div class="equippedBox" id="handLE">
+                                        left hand
+                                    </div>
+                                    <div class="equippedBox" id="hatE">
+                                        hat
+                                    </div>
+                                </div>
+                                <div class="vcontainer">
+                                    <div id="playerBase">
+                                        <img src="img/playerBase.png" alt="player base">
+                                        <div id="playerHat"></div>
+                                        <div id="playerShirt"></div>
+                                        <div id="playerHandL"></div>
+                                        <div id="playerPants"></div>
+                                        <div id="playerHandR"></div>
+                                        <div id="playerShoes"></div>
+                                    </div>
+                                </div>
+                                <div class="vcontainer">
+                                    <div class="equippedBox" id="pantsE">
+                                        pants
+                                    </div>
+                                    <div class="equippedBox" id="handRE">
+                                        right hand
+                                    </div>
+                                    <div class="equippedBox" id="shoesE">
+                                        shoes
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="borderM" id="equipInfo">
+                                Info
+                            </div>
+                        </div>
+                        <div class="clearfix"></div>
+                    </div>
+                    <div class="tabcontent" id="Inventory">
+                        <h3>Inventory</h3>
+                        <table id="invTable"></table>
+                    </div>
+                    <div class="tabcontent" id="Ingredients">
+                        <h3>London</h3>
+                        <p>London is the capital city of England.</p>
+                    </div>
+                    <div class="tabcontent" id="Recipes">
+                        <h3>Recipes</h3>
+                        <div class="arrow-left" id="recL"></div>
+                        <div id="recipeInfo">
+                            <div class="equippedBox" id="recIcon"><!-- Replace Image --><img height=
+                            "150px" src="img/potion.png" width="150px" alt="potion"></div><span id="recName">Basic
+                            Health Potion</span><br>
+                            <br>
+                            <span style="color:gold; margin-left: 5px">Base Value:</span> <span id=
+                            "recValue">10</span> <span style="color:gold">Mun</span>
+                        </div>
+                        <div id="recipeDisplay">
+                            <span id="recDesc">I am the potion description such as: weak healing
+                            potion with mild stamina regen effect.</span>
+                            <h4 style="color:gold;">Favorite of:</h4>
+                            <ul id="recFav">
+                                <li><img src="img/char.jpg" alt="customer">Asuno</li>
+                                <li><img src="img/garra.jpg" alt="customer">Gaara</li>
+                            </ul>
+                        </div>
+                        <div class="arrow-right" id="recR"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="mainMenu">
+            <!--<img src="img/m.jpg" width="100%" height="100%" id="bkgImg">-->
+            <div id="mainBtnContainer"> 
+                <span class="cBtn" id="NewGameBtn"> New Game </span>
+                <span class="cBtn" id="LoadGameBtn"> Load Game </span>
+                <span class="cBtn" id="OptionsBtn"> Options </span>
+                <span class="cBtn" id="CreditsBtn"> Credits </span>
+            </div>
+        </div>
+        <div id="startNewGame">
+            <div id="newGameBoard">
+                <span id="newGameText">New Game</span>
+                <div id="boardPaper">
+                    <span class="textWBkg" style="top: 50px"><br>Welcome to the demo of Apothecary. Art assets are not final and most are likely to change.</span>
+                    <span class="textWBkg"><br>For years you had trained with the local herbalist learning to create a wide array of medicines. They were training you to become the next village 
+                    healer, but it soon became clear that you were gifted in both brewing potions and mixing medical herbs. Over the years word spread of your medicine's potency and many would travel miles for your aid.
+                    News of your works spread as far as the capital. One day the royal guard showed in your home village and "requested" that you move to the castle in the capital, so that your services could be put to use there. 
+                    You said your goodbyes to your family, feeling a mix of emotions, and headed out with the guard toward your new home.
+                    </span>
+                    <span class="textWBkg" style="top: 150px; float: left;">Player Name: </span>
+                    <div class="field" id="nameform"> 
+                        <input type="text" id="nameterm" placeholder="Name" />
+                        <button type="button" id="nameEnter">Enter</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--Object Constructors-->
+    <script src = "Room.js"></script>
+    <script src = "Actor.js"></script>
+    <script src = "Item.js"></script>
+    <!--Graphics Handler-->
+    <script src = "Graphics.js"></script>
+    <!--Main JS-->
 	<script src = "main.js"></script>
 </body>
 </html>

@@ -1,561 +1,18 @@
-/********** Object Constructors ***********/
-        //Should only be one of each
-        const Item = (name_, id_, desc_, inRoomDesc_ = "", value_ = 0, type_, subType_, sprite_, isTakeable_ = false, isExaminable_ = false, isEdible_ = false) => {
-            let name = name_;
-            let id = id_;
-            let inRoomDesc = inRoomDesc_;
-            let value = value_;
-            let type = type_;
-            let subType = subType_;
-            let sprite = sprite_;
-            let isTakeable = isTakeable_;
-            let isExaminable = isExaminable_;
-            let desc = desc_;
-            let isEdible = isEdible_;
-            
-            //Needed varibles
-            if(name == null){
-                throw new Error("Error: Item must have name.");
-            }
-            if(id == null){
-                throw new Error("Error: Item must have id.");
-            }
-            
-            if(desc === undefined){
-                throw new Error("Error: Item must have description.");
-            }
-            
-            return{
-                getName: () => {
-                    return name;
-                },
-                getId: () => {
-                    return id;
-                },
-                getDesc: () => {
-                    return desc;
-                },
-                getInRoomDesc: () => {
-                    return inRoomDesc;
-                },
-                getValue: () => {
-                    return value;
-                },
-                getType: () => {
-                    return type;
-                },
-                getSprite: () => {
-                    return sprite;
-                },
-                getSubType: () => {
-                    return subType; 
-                },
-                isExaminable: () => {
-                    return isExaminable;
-                },
-                isEdible: () => {
-                    return isEdible;
-                }
-            } // /return
-        }; // /Item
-            
-        //Mapping an item to an inventory count
-        const InvItem = (item_, amount = 1) => {
-            let item = item_;
-            let count = amount;
-            
-             //Needed varibles
-            if(item == null){
-                throw new Error("Error: Item must not be " + item);
-            }
-            
-            return {
-                getName : () => {
-                    return item.getName();
-                },
-                getItem : () => {
-                    return item;
-                },
-                getCount : () => {
-                    return count;
-                }, 
-                add : (num = 1) => {
-                    count += num;
-                },
-                remove : (num = 1) => {
-                    count -= num;
-                }
-            }
-        };
-            
-        const Room = (name_, bkg_, initDesc_, exits_, morningDesc_, noonDesc_ = morningDesc_, eveningDesc_ = morningDesc_, nightDesc_ = morningDesc_,  isOutside_ = false, npcs_ = [], takeableItems_ = [], examinableItems_) =>{
-            let hasSeen = false;
-            let savedText = [];
-            let bkg = bkg_;
-            let exits = exits_;
-            let name = name_;
-            let initDesc = initDesc_;
-            let morningDesc = morningDesc_;
-            let noonDesc = noonDesc_;
-            let eveningDesc = eveningDesc_;
-            let nightDesc = nightDesc_;
-            let npcs = npcs_;
-            let takeableItems = takeableItems_;
-            let examinableItems = examinableItems_;
-            let isOutside = isOutside_;
-            
-            if(noonDesc === null){
-                noonDesc = morningDesc;
-            }
-            if(eveningDesc === null){
-                eveningDesc = morningDesc;
-            }
-            if(nightDesc === null){
-                nightDesc = morningDesc;
-            }
-            
-            return {
-                getName: () => {
-                    return name;
-                },
-                getBkg: () => {
-                    return bkg;
-                },
-                getHasSeen: () => {
-                    return hasSeen;
-                },
-                getInitDesc: () => {
-                    return initDesc;
-                },
-                getExits: () =>{
-                    return exits;
-                },
-                getMorningDesc: () => {
-                    return morningDesc;
-                },
-                getNoonDesc: () => {
-                    return noonDesc;
-                },
-                getEveningDesc: () => {
-                    return eveningDesc;
-                },
-                getNightDesc: () => {
-                    return nightDesc;
-                },
-                getDesc: () => {
-                    switch(timeOfDay){
-                        case "morning": 
-                            return morningDesc;
-                        case "noon":
-                            return noonDesc;
-                        case "evening":
-                            return eveningDesc;
-                        case "night":
-                            return nightDesc;
-                    }
-                },
-                isOutside: () => {
-                    return isOutside;
-                },
-                getNpcs: () => {
-                    return npcs;
-                },
-                getTakeableItems: () => {
-                    return takeableItems;
-                },
-                getExamineableItems: () => {
-                    return examinableItems;
-                },
-                setSavedText: (text) => {
-                  savedText = text;  
-                },
-                seenRoom: () => {
-                    hasSeen = true;
-                },
-                addExits: (e) => {
-                    if(!Array.isArray(e)){
-                        throw new Error("Error: Room exit must be an array.");
-                    }
-                    else
-                        exits = e;
-                }
-            }
-        };
         
-        const Exit = (dir_, nextRoom_, exitMsg_ = null) => {
-            let dir = dir_;
-            let nextRoom = nextRoom_;
-            let exitMsg = exitMsg_;
-            
-            return{
-                getDir: () => {
-                    return dir;
-                },
-                getNextRoom: () => {
-                    return nextRoom;
-                },
-                getExitMsg: () => {
-                    return exitMsg;
-                }
-            }
-        };
-        
-        const Actor = (name_, startState_, cutOut_, states_ = [], inv = []) => {
-            let name = name_;
-            let startState = startState_;   //The initial state of the actor
-            let state = startState;         //current state
-            let cutOut = cutOut_;           //The sprite of the actor
-            let states = states_;           //The possible states of the actor
-            let inventory = inv;            //The actors inventory
-            let currentRoom = currentRoom_; //The current room of the actor
-            let munny = munny_;             //The amount of munny on the actor
-            
-            return{
-                getName: () => {
-                    return name;
-                },
-                getStartState: () => {
-                    return startState;
-                },
-                getCutOut: () => {
-                    return cutOut
-                },
-                getStates: () => {
-                    return states;
-                },
-                getInv: () => {
-                    return inv;
-                },
-                getItemCount: (item = null) => {
-                    if(item === null){ //Do not check item count if item is null
-                        console.log("Error: cannot get item count. Item is null"); 
-                        return false;
-                    }
-                    for(let i of inventory){
-                        if(i.getItem() === item){
-                            return i.getCount();
-                        }
-                    }
-                    console.log("Error: actor does not have item ", item, " in their inventory");
-                    return false;
-                },
-                getCurrentRoom: () => {
-                    return currentRoom;
-                },
-                getMunny: () => {
-                    return munny;
-                },
-                 setMunny: (amount = 0) => {
-                    munny = amount;
-                },
-                setCurrentRoom: (room = currentRoom) => {
-                    currentRoom = room;
-                },
-                addMunny: (amount = 1) => {
-                  munny += amount;  
-                },
-                subMunny: (amount = 1) => {
-                    munny -= amount;
-                },
-                addToInv: (item, amount = 1) => { 
-                    for(let i of inventory){
-                        if(i.getItem() === item){
-                            i.add(amount);
-                            return true;
-                        }
-                    }
-                    inventory.push(InvItem(item, amount));
-                },
-                subFromInv: (item, amount = 1) => {
-                    for(let i of inventory){
-                        if(i.getItem() === item){
-                            i.remove(amount);
-                            if(i.getCount() <= 0){
-                                inventory.splice(inventory.indexOf(i), 1);
-                            }
-                            return true;
-                        }
-                    }
-                    console.log("Error: item: ", item, " could not be subtracted from actor's inventory. " , "item: ", item, " does not exsist in actor's inventory.")
-                    return false;
-                },
-                
-            }
-        };
-
-        const Player = (name_, currentRoom_, munny_ = 0, inv = [], equipped_ = [], equipment_ = [], ingChest_ = []) => {
-            let name = name_;
-            let inventory = inv;
-            let currentRoom = currentRoom_;
-            let munny = munny_;
-            let equipped = equipped_;
-            let equipment = equipment_;
-            let ingChest = ingChest_;
-            let isOutside = false;
-            let talking = false;
-            let interaction = null;
-            let interactingWith = null;
-     
-            return {
-                getName: () => {
-                    return name;
-                },
-                getInv: () => {
-                    return inventory;
-                },
-                getCurrentRoom: () => {
-                    return currentRoom;
-                },
-                getMunny: () => {
-                    return munny;
-                },
-                getEquipped: () => {
-                    return equipped;
-                },
-                getEquipment: () => {
-                    return equipment
-                }, 
-                getIngChest: () => {
-                    return ingChest;
-                },
-                getInteractingWith: () => {
-                    return interactingWith;
-                },
-                getItemCount: (item = null) => {
-                    if(item === null){ //Do not check item count if item is null
-                        console.log("Error: cannot get item count. Item is null"); 
-                        return false;
-                    }
-                    for(let i of inventory){
-                        if(i.getItem() === item){
-                            return i.getCount();
-                        }
-                    }
-                    console.log("Error: player does not have item ", item, " in their inventory");
-                },
-                isOutside: () => {
-                    return isOutside;
-                },
-                isTalking: () => {
-                    return talking;
-                },
-                updateOutsideFlag: () => {
-                    isOutside = currentRoom.isOutside();
-                },
-                setTalking: (bool) => {
-                    talking = bool;
-                },
-                setMunny: (amount = 0) => {
-                    munny = amount;
-                },
-                setEquipped: (equip = []) => {
-                    equipped = equip;
-                }, 
-                setCurrentRoom: (room = currentRoom) => {
-                    currentRoom = room;
-                },
-                startInteraction: (actor = null, action = null) => {
-                    if(actor === null || action === null){
-                        console.log("Error: player cannot start interaction. Both actor and action must be specified.");
-                        return false;
-                    }
-                    else{
-                        interactingWith = actor;
-                        
-                        switch(action){
-                            case "talking": setTalking(true); interaction = "talking"; break; 
-                            default: console.log("Error: cannot start interaction. ", action, " does not exist."); return false; 
-                        }
-                    }
-                },
-                stopInteraction: () => {
-                    interactingWith = null;
-                    interaction = null;
-                    settalking(false);
-                },
-                addMunny: (amount = 1) => {
-                  munny += amount;  
-                },
-                subMunny: (amount = 1) => {
-                    munny -= amount;
-                },
-                subFromInv: (item, amount = 1) => {
-                    let itemText;
-                    
-                    if(item.getType() == "equip"){
-                        equipment.splice(equipment.indexOf(item), 1);
-                        if(equipped.indexOf(item) != -1){
-                            unequip(item);
-                        }
-                    }
-                    else if(item.getType() == "ing"){
-                        ingChest.splice(ingChest.indexOf(item), 1);
-                    }
-                    else{
-                    
-                    for(let i of inventory){
-                        if(i.getItem() === item){ //Item is in inventory
-                            i.remove(amount);
-                            if(i.getCount() <= 0){ //There are no more of this item after it has been removed
-                                inventory.splice(inventory.indexOf(i), 1);
-                                $('.pop').popover('hide');
-                                itemText = "#" + item.getId(); 
-                                $(itemText).remove(); //Remove item from displayed inventory
-                            }
-                            else if(i.getCount === 1){ //There is only one of the item now
-                                itemText = "#" + id + " .itemText";
-                                $(itemText).text(item.getName()); //Removes item count by name in inventory
-                            }
-                            else{ //Multiple items left
-                                itemText = "#" + id + " .itemText";
-                                $(itemText).text("" + item.getName() + " x " + i.getCount());
-                            }
-                            return true;
-                        }
-                    }
-                    console.log("Error: item: ", item, " could not be subtracted from actor's inventory. " , "item: ", item, " does not exsist in actor's inventory.");
-                    return false;
-                    }
-                },
-                addToInv: (item, amount = 1) => { 
-                    let itemText;
-                    let actionLinks = '';
-                    
-                    //Check if item is a equipment or an ingrediant 
-                    if(item.getType() == "equip"){
-                        equipment.push(item);
-                    }
-                    else if(item.getType() == "ing"){
-                        ingChest.push(item);
-                    }
-                    else{
-
-                        //Fill in action links
-                        if (item.isEdible()) {
-                            actionLinks += '<a id=&quot;eat&quot; href=&quot;#&quot;>Eat</a><br>';
-                        }
-                        actionLinks += '<a id=&quot;examine&quot; href=&quot;javascript:examine(' + item.getId() + ')&quot;>Examine</a><br>';
-                        actionLinks += '<a d=&quot;drop&quot; href=&quot;javascript:dropItem(' + item.getId() + ')&quot;>Drop</a>';
-
-                        for(let i of inventory){
-                            if(i.getItem() === item){ //Item exsists in player inventory
-                                i.add(amount);
-                                itemText = "#" + item.getId() + " .itemText";
-                                $(itemText).text("" + item.getName() + " x " + i.getCount());
-                                return true;
-                            }
-                        }
-                        //Item is not in inventory
-                        inventory.push(InvItem(item, amount));
-                        if(amount > 1){
-                            itemText = "" + item.getName() + " x " + amount; //Display item amount if greater than 1
-                        }
-                        else{
-                            itemText = item.getName();
-                        }
-                        $(".inv ul").append("<li id=\"" + item.getId() + "\"><a class='pop' data-content='" + actionLinks + "'  data-toggle='popover' href='#' title='' data-original-title rel='popover'><span class='itemText'>" + itemText + '</span></a></li>');
-                        //Set up popover for inventory item
-                        $(".pop").popover({
-                            trigger: "manual",
-                            html: true,
-                            animation: false,
-                            placement: 'right',
-                            container: 'body',
-                        })
-                        .on("mouseenter", function() {
-                            if(!talking){
-                            let _this = this;
-                            $(this).popover("show");
-                            $(".popover").on("mouseleave", function() {
-                                $(_this).popover('hide');
-                            });
-                        }
-                        }).on("mouseleave", function() {
-                            let _this = this;
-                            setTimeout(function() {
-                                if (!$(".popover:hover").length) {
-                                    $(_this).popover("hide");
-                                }
-                            }, 30);
-                        });
-                    }
-                },
-                unequip: (item = null) => {
-                    if(item == null){
-                        console.log("Error: Cannot unequip item. It is ", item);
-                        return false; //Do not continue if item is equal to null
-                    }
-                    
-                    if(equipped.getIndex(item) != -1){ //Item is currently equipped
-                        equipped.splice(equipped.getIndex(item), 1); //Remove item from list of equipped items
-                        return true;
-                    }
-                    console.log(item, " is not currently equipped.");
-                }, 
-                equip: (item = null) => {
-                    if(item == null){
-                        console.log("Error: Cannot equip item. It is ", item);
-                        return false; //Do not continue if item is equal to null
-                    }
-                    
-                    if(equipped.getIndex(item) != -1){ //Item is currently equipped
-                       console.log("Error: cannot equip. ", item, " is already equipped.");
-                       return false;
-                    }
-                    equipped.push(item); //place item in list of equipped items
-                }
-            }
-        };
-        
-        const State = (pages_ = ["Error: this is a blank page. This state has no pages in it."]) => {
-            let pages = pages_;
-            let currentPage = 0;
-            
-            return{
-                getPages: () => {
-                    return pages;
-                },
-                getCurrentPage: () => {
-                    return currentPage;
-                },
-                readPage: () => {
-                    return pages[currentPage];
-                },
-                setCurrentPage: (page) => {
-                    currentPage = page;
-                },
-                pageFwd: () => {
-                    if(currentPage != pages.length-1){ //Dont move page foward if it is last page
-                        currentPage++;
-                        return true;
-                    }
-                    console.log("Error: cannot go to the next page. It is the last page in the state.");
-                    return false;
-                },
-                pagePev: () => {
-                    if(currentPage != 0){ //Dont move page foward if it is first page
-                        currentPage--;
-                        return true;
-                    }
-                    console.log("Error: cannot go to the previous page. It is the first page in the state.");
-                    return false;
-                }
-            }
-        };
-        /********** Varibles ***********/
-        
+       
+        /********** Varibles ***********/      
         let clock = 600;
         let timeOfDay = "morning";
-        const let rate = 0.5;
+        const rate = 0.5;
         let turns = 0;
-        const let N = "North";
-        const let S = "South";
-        const let E = "East";
-        const let W = "West";
-        const let NE = "NorthEast";
-        const let NW = "NorthWest";
-        const let SE = "SouthEast";
-        const let SW = "SouthWest";
+        const N = "North";
+        const S = "South";
+        const E = "East";
+        const W = "West";
+        const NE = "NorthEast";
+        const NW = "NorthWest";
+        const SE = "SouthEast";
+        const SW = "SouthWest";
         let ingShopCat = [];
         let resizeToggle = false;
         let player;
@@ -586,7 +43,7 @@
         };
         const addActionsBasedOnCurrRoom = () => {
             let currentRoom = player.getCurrentRoom();
-            if(!player.istalking()){
+            if(!player.isTalking()){
                 if (typeof currentRoom.getNpcs() != "undefined" && currentRoom.getNpcs() !== null && currentRoom.getNpcs().length > 0) {
                     $(".action ul").append('<li id="talk"><a href="#">Talk To</li>');
                 }
@@ -624,7 +81,7 @@
             takeTurn();
             $(".main").css("background", "url(" + currentRoom.getBkg() + ") center center/ cover no-repeat ");
             //Is the player outside?
-             player.updateOutsideFlag();
+            player.updateOutsideFlag();
             currentRoom.setSavedText([]);
             refreshRoom(exit);
             if(!currentRoom.getHasSeen())
@@ -884,7 +341,7 @@
                             sel = "#shoesE"; 
                             sel2 = "#playerShoes";
                             break;
-                        default: console.log("Error: No equippable subtype for item");
+                        default: throw new Error("Error: No equippable subtype for item");
                     }
                     console.log("sel= "+sel);
                     $(sel).empty();
@@ -1190,20 +647,22 @@
             document.getElementById("defaultOpen").click();
             ingShopCat = [key, comb];
             $("#ingShop").toggle();
-            $("#roam").toggle();
-            //$("#mainMenu").toggle();
+            //$("#roam").toggle();
+            $("#mainMenu").toggle();
             $("#startNewGame").toggle();
-            $("#nameBox").toggle(); 
-            changeRoom();            
+            $("#nameBox").toggle();            
         }
         const roamInit = () => {
             $(".Playername").text(player.getName());
         }
         const startGameInit = (name) => {
             player = Player(name, bedRoom, 100);
-            player.getCurrentRoom().hasSeen() = false;
-            player.addInv(brownShirt);
-            player.addInv(blueSkirt);
+            player.getCurrentRoom().setHasSeen(false);
+            player.addToInv(brownShirt);
+            player.addToInv(blueSkirt);
+            player.addToInv(comb);
+            player.addToInv(key, 2);
+            changeRoom(); 
             roamInit();
             state = AierithIntro;
             toggleTalk(Aierith);
@@ -1268,9 +727,8 @@
         let Aierith = Actor("Aierith", AierithIntro, "img/Aierith.png");
         /********** Main ***********/
         window.onload = function () {
+            let screen = Screen();
+            screen.init();
+            screen.loadRoom(bedRoom);
             preGameinit();
-            comb.add();
-            key.add(2);
-            
-            console.log("edit");
         }
