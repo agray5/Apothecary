@@ -1,5 +1,5 @@
 //Should only be one of each
-        const Item = (name_, id_, desc_, inRoomDesc_ = "", value_ = 0, type_, subType_, sprite_, isTakeable_ = false, isExaminable_ = false, isEdible_ = false) => {
+        const Item = (name_, id_, desc_, inRoomDesc_ = "lays on the floor", value_ = 0, type_, subType_, sprite_, isTakeable_ = false, isExaminable_ = false, isEdible_ = false) => {
             let name = name_;
             let id = id_;
             let inRoomDesc = inRoomDesc_;
@@ -22,6 +22,9 @@
             
             if(desc === undefined){
                 throw new Error("Error: Item must have description.");
+            }
+            if(inRoomDesc === null){
+                inRoomDesc = "lays on the floor";
             }
             
             return{

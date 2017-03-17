@@ -16,7 +16,7 @@
 </head>
 <body>
     <div id="content">
-        <div id="roam">
+        <div id="roam" class="dontDisplay">
             <div class="inv">
                 Inventory
                 <ul>
@@ -58,7 +58,7 @@
                 </ul>
             </div>
         </div>
-        <div id="shop">
+        <div id="shop"  class="dontDisplay">
             <div class="ingBackground"></div>
             <div id="ingShopBorder">
                 <div class="borderM" id="buyM">
@@ -203,7 +203,7 @@
                 </div>
             </div>
         </div>
-        <div id="mainMenu">
+        <div id="mainMenu"  class="dontDisplay">
             <!--<img src="img/m.jpg" width="100%" height="100%" id="bkgImg">-->
             <div id="mainBtnContainer"> 
                 <span class="cBtn" id="NewGameBtn"> New Game </span>
@@ -212,7 +212,7 @@
                 <span class="cBtn" id="CreditsBtn"> Credits </span>
             </div>
         </div>
-        <div id="startNewGame">
+        <div id="startNewGame" class="dontDisplay">
             <div id="newGameBoard">
                 <span id="newGameText">New Game</span>
                 <div id="boardPaper">
@@ -235,6 +235,10 @@
     <script src = "Room.js"></script>
     <script src = "Actor.js"></script>
     <script src = "Item.js"></script>
+    <!--Objects-->
+    <script src="Objects.js"></script>
+     <!--Events-->
+    <script src="Events.js"></script>
     <!--Graphics Handler-->
     <script src = "Graphics.js"></script>
     <!--Main JS-->

@@ -56,13 +56,24 @@
                     munny -= amount;
                 },
                 addToInv: (item, amount = 1) => { 
+                    let isNew = false;
+                    let count = 0;
+                        
+                    if(inventory.indexOf(item) === -1){
+                        inventory.push(InvItem(item, amount));
+                        isNew = true;
+                    }
+                    //Find count of invItem
                     for(let i of inventory){
-                        if(i.getItem() === item){
-                            i.add(amount);
-                            return true;
+                        if(i.getItem === item){
+                            if(!isNew){//Item exsists in player inventory
+                                inventory[inventory.indexOf(item)].add(amount);
+                            }
+                            count = i.getCount();
                         }
                     }
-                    inventory.push(InvItem(item, amount));
+                    updateInvColItem(item, inventory[inventory.indexOf(item)].getCount(), isNew);
+                        
                 },
                 subFromInv: (item, amount = 1) => {
                     for(let i of inventory){
@@ -74,10 +85,33 @@
                             return true;
                         }
                     }
-                    throw new Error("Error: item: "+ item + " could not be subtracted from actor's inventory. item: " + item + " does not exsist in actor's inventory.");
+                    console.warn("Warning: item: "+ item + " could not be subtracted from actor's inventory. item: " + item + " does not exsist in actor's inventory.");
                     return false;
                 },
-                
+                drop: (item = null) => {
+                    if(item === null){
+                        console.warn("Warning: cannot drop item. It is null");
+                        return false;
+                    }
+                    //this.subFromInv(item);
+                    currentRoom.addToTakableItems(item);
+                    refreshActions(currentRoom);
+                    lookAround(currentRoom);
+                }, 
+                take: (item) => {
+                    let index = currentRoom.getTakeableItems().indexOf(item);
+                    
+                    if (index !== -1) {
+                        addToInv(item);
+                        currentRoom.getTakeableItems().splice(index, 1); //Remove item from rooms takable items
+                        refreshActions(currentRoom);
+                        lookAround(currentRoom);
+                    }
+                    else{
+                        console.warn("Warning: The item is not in the actors current room");
+                    }
+                }
+                    
             }
         };
 
@@ -190,35 +224,24 @@
                         ingChest.splice(ingChest.indexOf(item), 1);
                     }
                     else{
-                    
-                    for(let i of inventory){
-                        if(i.getItem() === item){ //Item is in inventory
+                        if(inventory.indexOf(item) !== -1){ //Item is in inventory
+                            let i = inventory[inventory.indexOf(item)];
                             i.remove(amount);
                             if(i.getCount() <= 0){ //There are no more of this item after it has been removed
                                 inventory.splice(inventory.indexOf(i), 1);
-                                $('.pop').popover('hide');
-                                itemText = "#" + item.getId(); 
-                                $(itemText).remove(); //Remove item from displayed inventory
+                                removeFromInvCol()
                             }
-                            else if(i.getCount === 1){ //There is only one of the item now
-                                itemText = "#" + id + " .itemText";
-                                $(itemText).text(item.getName()); //Removes item count by name in inventory
-                            }
-                            else{ //Multiple items left
-                                itemText = "#" + id + " .itemText";
-                                $(itemText).text("" + item.getName() + " x " + i.getCount());
+                            else{
+                                updateInvColItem(item, i.getCount()); //Update inventory text
                             }
                             return true;
                         }
                     }
-                    console.log("Error: item: " + item + " could not be subtracted from actor's inventory. item: " + item + " does not exsist in actor's inventory.");
+                    console.warn("Warning: item: " + item + " could not be subtracted from actor's inventory. item: " + item + " does not exsist in actor's inventory.");
                     return false;
-                    }
                 },
-                addToInv: (item, amount = 1) => { 
-                    let itemText;
-                    let actionLinks = '';
-                    
+                addToInv: (item, amount = 1) => {
+                    console.log("player add to inv");
                     //Check if item is a equipment or an ingrediant 
                     if(item.getType() == "equip"){
                         equipment.push(item);
@@ -226,78 +249,71 @@
                     else if(item.getType() == "ing"){
                         ingChest.push(item);
                     }
-                    else{
-
-                        //Fill in action links
-                        if (item.isEdible()) {
-                            actionLinks += '<a id=&quot;eat&quot; href=&quot;#&quot;>Eat</a><br>';
+                    else{ //Everything else goes into normal inventory
+                        let isNew = false;
+                        let count = 0;
+                        
+                        if(inventory.indexOf(item) === -1){
+                            inventory.push(InvItem(item, amount));
+                            isNew = true;
                         }
-                        actionLinks += '<a id=&quot;examine&quot; href=&quot;javascript:examine(' + item.getId() + ')&quot;>Examine</a><br>';
-                        actionLinks += '<a d=&quot;drop&quot; href=&quot;javascript:dropItem(' + item.getId() + ')&quot;>Drop</a>';
-
+                        //Find count of invItem
                         for(let i of inventory){
-                            if(i.getItem() === item){ //Item exsists in player inventory
-                                i.add(amount);
-                                itemText = "#" + item.getId() + " .itemText";
-                                $(itemText).text("" + item.getName() + " x " + i.getCount());
-                                return true;
+                            if(i.getItem === item){
+                                if(!isNew){//Item exsists in player inventory
+                                    inventory[inventory.indexOf(item)].add(amount);
+                                }
+                                count = i.getCount();
                             }
                         }
-                        //Item is not in inventory
-                        inventory.push(InvItem(item, amount));
-                        if(amount > 1){
-                            itemText = "" + item.getName() + " x " + amount; //Display item amount if greater than 1
-                        }
-                        else{
-                            itemText = item.getName();
-                        }
-                        $(".inv ul").append("<li id=\"" + item.getId() + "\"><a class='pop' data-content='" + actionLinks + "'  data-toggle='popover' href='#' title='' data-original-title rel='popover'><span class='itemText'>" + itemText + '</span></a></li>');
-                        //Set up popover for inventory item
-                        $(".pop").popover({
-                            trigger: "manual",
-                            html: true,
-                            animation: false,
-                            placement: 'right',
-                            container: 'body',
-                        })
-                        .on("mouseenter", function() {
-                            if(!talking){
-                            let _this = this;
-                            $(this).popover("show");
-                            $(".popover").on("mouseleave", function() {
-                                $(_this).popover('hide');
-                            });
-                        }
-                        }).on("mouseleave", function() {
-                            let _this = this;
-                            setTimeout(function() {
-                                if (!$(".popover:hover").length) {
-                                    $(_this).popover("hide");
-                                }
-                            }, 30);
-                        });
+                        updateInvColItem(item, inventory[inventory.indexOf(item)].getCount(), isNew);
+                        
+                    }
+                       
+                },
+                drop: (item = null) => {
+                    if(item === null){
+                        console.warn("Warning: cannot drop item. It is null");
+                        return false;
+                    }
+                    //subFromInv(item);
+                    currentRoom.addToTakableItems(item);
+                    refreshActions(currentRoom);
+                    lookAround(currentRoom);
+                },
+                take: (item) => {
+                    let index = currentRoom.getTakeableItems().indexOf(item);
+                    
+                    if (index !== -1) {
+                        addToInv(item);
+                        currentRoom.getTakeableItems().splice(index, 1); //Remove item from rooms takable items
+                        refreshActions(currentRoom);
+                        lookAround(currentRoom);
+                    }
+                    else{
+                        console.warn("Warning: The item is not in the actors current room");
                     }
                 },
                 unequip: (item = null) => {
                     if(item == null){
-                        throw new Error("Error: Cannot unequip item. It is " + item);
+                        console.warn("Warning: Cannot unequip item. It is " + item);
                         return false; //Do not continue if item is equal to null
                     }
                     
-                    if(equipped.getIndex(item) != -1){ //Item is currently equipped
-                        equipped.splice(equipped.getIndex(item), 1); //Remove item from list of equipped items
+                    if(equipped.indexOf(item) != -1){ //Item is currently equipped
+                        equipped.splice(equipped.indexOf(item), 1); //Remove item from list of equipped items
                         return true;
                     }
-                    console.log(item, " is not currently equipped.");
+                    console.warn("Warning: ",item, " is not currently equipped.");
                 }, 
                 equip: (item = null) => {
                     if(item == null){
-                        throw new Error("Error: Cannot equip item. It is " + item);
+                        console.warn("Warning: Cannot equip item. It is " + item);
                         return false; //Do not continue if item is equal to null
                     }
                     
-                    if(equipped.getIndex(item) != -1){ //Item is currently equipped
-                       throw new Error("Error: cannot equip. " + item + " is already equipped.");
+                    if(equipped.indexOf(item) != -1){ //Item is currently equipped
+                       console.warn("Warning: cannot equip. " + item + " is already equipped.");
                        return false;
                     }
                     equipped.push(item); //place item in list of equipped items
@@ -327,7 +343,7 @@
                         currentPage++;
                         return true;
                     }
-                    throw new Error("Error: cannot go to the next page. It is the last page in the state.");
+                    console.warn("Warning: cannot go to the next page. It is the last page in the state.");
                     return false;
                 },
                 pagePev: () => {
@@ -335,7 +351,7 @@
                         currentPage--;
                         return true;
                     }
-                    throw new Error("Error: cannot go to the previous page. It is the first page in the state.");
+                    console.warn("Warning: cannot go to the previous page. It is the first page in the state.");
                     return false;
                 }
             }

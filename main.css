@@ -1,3 +1,6 @@
+.dontDisplay{
+    display: none;
+}
 /********** Main Menu ***********/
 #mainMenu{
 	height: 100vh;
@@ -13,7 +16,6 @@
 	padding: 0 6px;
 	color: white;
 	text-shadow: 1px 1px 0 rgba(140,140,140,0.6) , -1px -1px 1px rgba(0,0,0,0.67) ;
-	user-select: none;
 	z-index: 20;
 	height: 75px; 
 	width: 165px;
@@ -104,9 +106,8 @@
   border:none;
   cursor: pointer;
 }
-
+/*********************************** ROAM ********************************/
 /********** INVENTORY ***********/
-
 .inv {
 	float: left;
 	margin: 0;
@@ -146,8 +147,7 @@
 	padding: 1em;
 	height: 100vh;
 	text-align: center;
-	 background: url('img/bedroom.png') center center/ cover no-repeat; //have to change
-	 background-size: cover !important;
+    background: url('img/bedroom.png') center center/ cover no-repeat; //have to change
 }
 
 
@@ -339,7 +339,7 @@ li a:hover, li a.selected {
  }
 
  /********** Shop ***********/
- .ingBackground {
+ .shop {
 	  position: fixed;
 	  /* change background */
 	  background: url('img/ingShopBackground.jpg') no-repeat center center fixed;
@@ -356,7 +356,7 @@ li a:hover, li a.selected {
 	  z-index: 10;
 	}
 
- div#ingShopBorder{
+ div#shopBorder{
 	background: -moz-radial-gradient(center, ellipse cover, rgba(0,0,0,0.65) 0%, rgba(0,0,0,1) 100%); 
 	background: -webkit-radial-gradient(center, ellipse cover, rgba(0,0,0,0.65) 0%,rgba(0,0,0,1) 100%); 
 	background: radial-gradient(ellipse at center, rgba(0,0,0,0.65) 0%,rgba(0,0,0,1) 100%);
