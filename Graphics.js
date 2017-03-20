@@ -67,11 +67,7 @@ const loadRoom = (room = null, exitMsg = null) => {
     loadActionsBasedOnRoom(room);
 }
 
-//Handles loading a shops graphics
-const loadShop = () => {
-    changeMode("shop");
-    //TODO
-}
+
 
 const addText = (text) => {
     $(".textBox").append("<p>" + text + "</p>");
@@ -134,15 +130,13 @@ const updateInvColItem = (item, amount = 1, isNew = false) => {
     //Check if item is singular
     if (amount > 1) {
         itemText += item.getName() + " x " + amount //Display item amount if greater than 1
-    } 
-    else {
+    } else {
         itemText += item.getName();
     }
     //Create new listing if it is not inventory
-    if(!isNew){
+    if (!isNew) {
         $(element).text(itemText);
-    }
-    else {
+    } else {
         //Fill in action links
         if (item.isEdible()) {
             actionLinks += '<a id=&quot;eat&quot; href=&quot;#&quot;>Eat</a><br>';
@@ -177,3 +171,40 @@ const updateInvColItem = (item, amount = 1, isNew = false) => {
             });
     }
 }
+
+//Handles loading a shops graphics
+const loadShop = (room) => {
+    if (!room.isShop()) {
+        console.warn("Warning: Cannot load room as a shop. It is not a shop");
+        return false;
+    }
+    changeMode("shop");
+    for (let i of room.getShopInv()) {
+        $("#buyTable").append('<tr id=' + i.getId() + 'BM><td>' + selectIcon(i.getType()) + "  " + i.getName() + '</td><td>' + i.getValue() + '</td><td>X</td><td><span class="buyAmount"><button class="up" onclick="javascript:setQuantity(\'up\',' + i.getId() + ',' + i.getValue() + ')">+</button>' +
+            '<input type="text" value="0" style="width: 20px"><button class="down" onclick="javascript:setQuantity(\'down\',' + i.getId() + ',' + i.getValue() + ')">-</button></span></td><td><span class="buyItemTotal">0</td></tr>');
+    }
+    //TODO
+}
+
+const setQuantity = (upordown, id, cost, munny) => {
+    let str = '#' + id + 'BM input';
+    let str2 = '#' + id + 'BM .buyItemTotal';
+    let value = parseInt($(str).val());
+    let total = parseInt($('#buyTotalAmount').text());
+    let itemTotal;
+    if (upordown == 'up' && !((total + cost) > munny)) {
+        value++;
+        total += cost;
+    } else if (upordown == 'down') {
+        if (value <= 0)
+            value = 0;
+        else {
+            value--;
+            total -= cost;
+        }
+    }
+    itemTotal = value * cost;
+    $(str).val(value);
+    $(str2).text(itemTotal);
+    $('#buyTotalAmount').text(total);
+};

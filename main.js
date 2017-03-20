@@ -25,11 +25,7 @@
         };
 
 
-        /* Back Action */
-        const menuBack = () => {
-            $(".action ul").empty();
-            addActionsBasedOnCurrRoom();
-        };
+
         /* Time */
         const turnsToTime = () => {
             let rateXturns = rate * turns;
@@ -64,41 +60,8 @@
                 $("#time").text(timeOfDay);
             }
         };
-        /* Ingredient Shop */
-        $("#buy_exit").on("click", function(event) {
-            $("#buyTable").empty();
-            $("#roam").toggle();
-            $("#ingShop").toggle();
-            //$(".ingBackground").toggle();
-        });
-        const loadShopMenu = () => {
-            for (let i of ingShopCat) {
-                $("#buyTable").append('<tr id=' + i.getId() + 'BM><td>' + selectIcon(i.getType()) + "  " + i.getName() + '</td><td>' + i.getValue() + '</td><td>X</td><td><span class="buyAmount"><button class="up" onclick="javascript:setQuantity(\'up\',' + i.getId() + ',' + i.getValue() + ')">+</button>' +
-                    '<input type="text" value="0" style="width: 20px"><button class="down" onclick="javascript:setQuantity(\'down\',' + i.getId() + ',' + i.getValue() + ')">-</button></span></td><td><span class="buyItemTotal">0</td></tr>');
-            }
-        }
-        const setQuantity = (upordown, id, cost) => {
-            let str = '#' + id + 'BM input';
-            let str2 = '#' + id + 'BM .buyItemTotal';
-            let value = parseInt($(str).val());
-            let total = parseInt($('#buyTotalAmount').text());
-            let itemTotal;
-            if (upordown == 'up' && !((total + cost) > munny)) {
-                value++;
-                total += cost;
-            } else if (upordown == 'down') {
-                if (value <= 0)
-                    value = 0;
-                else {
-                    value--;
-                    total -= cost;
-                }
-            }
-            itemTotal = value * cost;
-            $(str).val(value);
-            $(str2).text(itemTotal);
-            $('#buyTotalAmount').text(total);
-        };
+
+
         //icons from http://game-icons.net
         const selectIcon = (type) => {
             switch (type) {
@@ -413,22 +376,6 @@
             $(".action ul").append('<li id="back"><button type="image" src="img/parch.png" class = "btn-custom" class="btn ">Back</button></li>');
         });
     
-        /* Take.Item Click */
-        $(".action").on("click", "li.takeable", function(event) {
-            takeTurn();
-            for (let i of currentRoom.getTakeableItems()) {
-                if (i.getId() == this.getId()) {
-                    takeItem(i);
-                }
-            }
-            if (currentRoom.getTakeableItems().length == 0) {
-                menuBack();
-            }
-        });
-        /* Take.Back Click */
-        $(".action").on("click", "#back", function(event) {
-            menuBack();
-        });
         
         /* Shop Click */
         $(".action").on("click", "#shop", function(event) {

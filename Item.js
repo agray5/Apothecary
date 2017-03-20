@@ -78,6 +78,9 @@
                 getItem : () => {
                     return item;
                 },
+                getId : (item) => {
+                  return item.getId();  
+                },
                 getCount : () => {
                     return count;
                 }, 
