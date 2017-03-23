@@ -7,7 +7,8 @@
      let inventory = inv; //The actors inventory
      let currentRoom = startRoom; //The current room of the actor
      let munny = munny_; //The amount of munny on the actor
-
+     let g = sceen();
+     
      const addToInv = (item, amount = 1) => {
          let isNew = false;
          let count = 0;

@@ -5,6 +5,7 @@
         let turns = 0;
         let resizeToggle = false;
         let player;
+        let g; //graphics
 
         /********** Functions ***********/
         
@@ -62,15 +63,7 @@
         };
 
 
-        //icons from http://game-icons.net
-        const selectIcon = (type) => {
-            switch (type) {
-                case "ing":
-                    return "<img src='img/tree-branch.png'>";
-                default:
-                    return "<img src='img/locked-chest.png'>";
-            }
-        };
+
         $("#IngBuyButton").click(function() {
             let total = parseInt($('#buyTotalAmount').text());
             subMunny(total);
@@ -487,9 +480,10 @@
         
         /********** Main ***********/
         window.onload = function () {
-            ginit();
-            loadRoom(shop);
             let player = Player("me", shop, 100);
+            g = screen(player);
+            g.ginit();
+            g.loadRoom(shop);
             player.addToInv(comb);
             player.drop(comb);
             //preGameinit();
