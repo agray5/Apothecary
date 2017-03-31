@@ -1,7 +1,7 @@
-const screen = (player_) => {
-    let mode; //Mode determines what div to effect
-    const divs = ["roam", "shop"]; //Divs to toggle betwwen visbility
-    const player = player_;
+const Graphics = () => {
+    let rendering = false;
+    let renderQueue = [];
+    let mode;
 
     //Will load a rooms actions based on context of room
     const loadActionsBasedOnRoom = (room) => {
@@ -58,158 +58,218 @@ const screen = (player_) => {
         $(".textBox").append("<p>" + text + "</p>");
     }
 
-    return {
-        loadActionsBasedOnRoom,
-        ginit: () => {
-            changeMode("roam");
-        },
-        loadRoom: (room = null, exitMsg = null) => { //Handles loading a rooms graphics
-            if (room === null) {
-                throw new Error("Error: could not load room. Room cannot be null");
-                return false;
-            }
-            changeMode("roam");
-            //Set background
-            updateBkg(room.getBkg());
-            //Set Room Name
-            $("#roomName").text(room.getName());
-            //Flush Main Screen
-            flushMainScreen();
-            //Add exit msg if there is one
-            if (exitMsg !== null) {
-                addText(exitMsg);
-            }
-            //Add Room Desc
-            if (!room.getHasSeen() && room.getInitDesc() !== null) {
-                addText(room.getInitDesc());
-            } else {
-                addText(room.getDesc());
-            }
-            //Add Takeable items to description
-            if (room.getTakeableItems() != null && room.getTakeableItems().length > 0) {
-                for (let i of room.getTakeableItems()) {
-                    addText('\n <span class="inTextBox" id="' + i.getId() + 'inRoom">' + i.getInRoomDesc() + "</span>");
-                }
-            }
 
-            //Set Exits
-            for (let e of room.getExits()) {
-                $("ul.exit").append("<li id='" + e.getDir() + "'><a href='#'>" + e.getDir() + "</li>");
-            }
 
-            //Load the action bar
-            loadActionsBasedOnRoom(room);
-        },
-        addAction: (id, name) => {
-            if (mode = "roam") {
-                $(".action ul").append('<li id="' + id + '"><a href="#">' + name + '</li>');
-            }
-        },
-        removeAction: (id) => {
-            if (mode = "roam") {
-                $(".action #" + id).remove();
-            }
-        },
-        refreshActions: (room) => { //used if we only want to refersh actions
-            $(".action ul").empty();
-            loadActionsBasedOnRoom(room);
-        },
-        removeFromInvCol: (item) => {
-            $('.pop').popover('hide');
-            itemText = "#" + item.getId();
-            $(itemText).remove(); //Remove item from displayed inventory
-        },
-        updateInvColItem: (item, amount = 1, isNew = false) => {
-            let actionLinks = "";
-            let element = "";
-            let itemText = "";
+    const addAction = (id, name) => {
+        if (mode = "roam") {
+            $(".action ul").append('<li id="' + id + '"><a href="#">' + name + '</li>');
+        }
+    }
+    const removeAction = (id) => {
+        if (mode = "roam") {
+            $(".action #" + id).remove();
+        }
+    }
+    const refreshActions = (room) => { //used if we only want to refersh actions
+        $(".action ul").empty();
+        loadActionsBasedOnRoom(room);
+    }
 
-            element = "#" + item.getId() + " .itemText";
-            //Check if item is singular
-            if (amount > 1) {
-                itemText += item.getName() + " x " + amount //Display item amount if greater than 1
-            } else {
-                itemText += item.getName();
+    //Should be a list of invItem 
+    const setInvCol = (inv = null) => {
+        if (invMap === null) {
+            console.warn("Warning: cannot set inventory column. invMap cannot be null");
+            return false;
+        }
+
+        emptyInvCol();
+
+        for (let i in inv) {
+            updateInvColItem(i.getItem(), i.getCount(), true);
+        }
+
+    }
+
+    const emptyInvCol = () => {
+        $(".inv ul").empty();
+    }
+
+    const removeFromInvCol = (item) => {
+        $('.pop').popover('hide');
+        itemText = "#" + item.getId();
+        $(itemText).remove(); //Remove item from displayed inventory
+    }
+    const updateInvColItem = (item, amount = 1, isNew = false) => {
+        let actionLinks = "";
+        let element = "";
+        let itemText = "";
+
+        element = "#" + item.getId() + " .itemText";
+        //Check if item is singular
+        if (amount > 1) {
+            itemText += item.getName() + " x " + amount //Display item amount if greater than 1
+        } else {
+            itemText += item.getName();
+        }
+        //Create new listing if it is not inventory
+        if (!isNew) {
+            $(element).text(itemText);
+        } else {
+            //Fill in action links
+            if (item.isEdible()) {
+                actionLinks += '<a id=&quot;eat&quot; href=&quot;#&quot;>Eat</a><br>';
             }
-            //Create new listing if it is not inventory
-            if (!isNew) {
-                $(element).text(itemText);
-            } else {
-                //Fill in action links
-                if (item.isEdible()) {
-                    actionLinks += '<a id=&quot;eat&quot; href=&quot;#&quot;>Eat</a><br>';
-                }
-                actionLinks += '<a id=&quot;examine&quot; href=&quot;javascript:examine(' + item.getId() + ')&quot;>Examine</a><br>';
-                actionLinks += '<a d=&quot;drop&quot; href=&quot;javascript:dropItem(' + item.getId() + ')&quot;>Drop</a>';
-                //Create popover for new listing
-                $(".inv ul").append("<li id=\"" + item.getId() + "\"><a class='pop' data-content='" + actionLinks + "'  data-toggle='popover' href='#' title='' data-original-title     rel='popover'><span class='itemText'>" + itemText + '</span></a></li>');
-                //Set up popover for inventory item
-                $(".pop").popover({
-                        trigger: "manual",
-                        html: true,
-                        animation: false,
-                        placement: 'right',
-                        container: 'body',
-                    })
-                    .on("mouseenter", function() {
-                        if (!talking) {
-                            let _this = this;
-                            $(this).popover("show");
-                            $(".popover").on("mouseleave", function() {
-                                $(_this).popover('hide');
-                            });
-                        }
-                    }).on("mouseleave", function() {
+            actionLinks += '<a id=&quot;examine&quot; href=&quot;javascript:examine(' + item.getId() + ')&quot;>Examine</a><br>';
+            actionLinks += '<a d=&quot;drop&quot; href=&quot;javascript:dropItem(' + item.getId() + ')&quot;>Drop</a>';
+            //Create popover for new listing
+            $(".inv ul").append("<li id=\"" + item.getId() + "\"><a class='pop' data-content='" + actionLinks + "'  data-toggle='popover' href='#' title='' data-original-title     rel='popover'><span class='itemText'>" + itemText + '</span></a></li>');
+            //Set up popover for inventory item
+            $(".pop").popover({
+                    trigger: "manual",
+                    html: true,
+                    animation: false,
+                    placement: 'right',
+                    container: 'body',
+                })
+                .on("mouseenter", function () {
+                    if (!talking) {
                         let _this = this;
-                        setTimeout(function() {
-                            if (!$(".popover:hover").length) {
-                                $(_this).popover("hide");
-                            }
-                        }, 30);
-                    });
+                        $(this).popover("show");
+                        $(".popover").on("mouseleave", function () {
+                            $(_this).popover('hide');
+                        });
+                    }
+                }).on("mouseleave", function () {
+                    let _this = this;
+                    setTimeout(function () {
+                        if (!$(".popover:hover").length) {
+                            $(_this).popover("hide");
+                        }
+                    }, 30);
+                });
+        }
+    }
+
+    const setQuantity = (upordown, id, cost) => {
+        let str = '#' + id + 'BM input';
+        let str2 = '#' + id + 'BM .buyItemTotal';
+        let value = parseInt($(str).val());
+        let total = parseInt($('#buyTotalAmount').text());
+        let itemTotal;
+        if (upordown == 'up' && !((total + cost) > player.getMunny())) {
+            value++;
+            total += cost;
+        } else if (upordown == 'down') {
+            if (value <= 0)
+                value = 0;
+            else {
+                value--;
+                total -= cost;
             }
-        },
-        loadShop: (room) => { //Handles loading a shops graphics
-            if (!room.isShop()) {
-                console.warn("Warning: Cannot load room as a shop. It is not a shop");
-                return false;
+        }
+        itemTotal = value * cost;
+        $(str).val(value);
+        $(str2).text(itemTotal);
+        $('#buyTotalAmount').text(total);
+    }
+    const selectIcon = (type) => { //icons from http://game-icons.net
+        switch (type) {
+            case "ing":
+                return "<img src='img/tree-branch.png'>";
+            default:
+                return "<img src='img/locked-chest.png'>";
+        }
+    }
+
+    const loadShop = (room) => { //Handles loading a shops graphics
+        //check if room has attached shop
+        if (!room.isShop()) {
+            console.warn("Warning: Cannot load room as a shop. It is not a shop");
+            return false;
+        }
+        //selct shop div
+        changeMode("shop");
+        //load shop inv
+        for (let i of room.getShop().getInv()) {
+            $("#buyTable").append('<tr id=' + i.getId() + 'BM><td>' + selectIcon(i.getType()) + "  " + i.getName() + '</td><td>' + i.getValue() + '</td><td>X</td><td><span class="buyAmount"><button class="up" onclick="javascript:setQuantity(\'up\',' + i.getId() + ',' + i.getValue() + ')">+</button>' +
+                '<input type="text" value="0" style="width: 20px"><button class="down" onclick="javascript:setQuantity(\'down\',' + i.getId() + ',' + i.getValue() + ')">-</button></span></td><td><span class="buyItemTotal">0</td></tr>');
+        }
+        //Set background
+        updateBkg(room.getShop().getBkg());
+    }
+
+    const loadRoom = (room = null, exitMsg = null) => { //Handles loading a rooms graphics
+        if (room === null) {
+            throw new Error("Error: could not load room. Room cannot be null");
+            return false;
+        }
+        changeMode("roam");
+        //Set background
+        updateBkg(room.getBkg());
+        //Set Room Name
+        $("#roomName").text(room.getName());
+        //Flush Main Screen
+        flushMainScreen();
+        //Add exit msg if there is one
+        if (exitMsg !== null) {
+            addText(exitMsg);
+        }
+        //Add Room Desc
+        if (!room.getHasSeen() && room.getInitDesc() !== null) {
+            addText(room.getInitDesc());
+        } else {
+            addText(room.getDesc());
+        }
+        //Add Takeable items to description
+        if (room.getTakeableItems() != null && room.getTakeableItems().length > 0) {
+            for (let i of room.getTakeableItems()) {
+                addText('\n <span class="inTextBox" id="' + i.getId() + 'inRoom">' + i.getInRoomDesc() + "</span>");
             }
-            changeMode("shop");
-            for (let i of room.getShopInv()) {
-                $("#buyTable").append('<tr id=' + i.getId() + 'BM><td>' + selectIcon(i.getType()) + "  " + i.getName() + '</td><td>' + i.getValue() + '</td><td>X</td><td><span class="buyAmount"><button class="up" onclick="javascript:setQuantity(\'up\',' + i.getId() + ',' + i.getValue() + ')">+</button>' +
-                    '<input type="text" value="0" style="width: 20px"><button class="down" onclick="javascript:setQuantity(\'down\',' + i.getId() + ',' + i.getValue() + ')">-</button></span></td><td><span class="buyItemTotal">0</td></tr>');
+        }
+
+        //Set Exits
+        for (let e of room.getExits()) {
+            $("ul.exit").append("<li id='" + e.getDir() + "'><a href='#'>" + e.getDir() + "</li>");
+        }
+
+        //Load the action bar
+        loadActionsBasedOnRoom(room);
+    }
+
+    // const addToRenderQueue = (op) => {
+    // renderQueue.push(op);
+    //}
+
+    return {
+        render: (op, ops) => {
+            //addToRenderQueue(op);
+
+            //if (rendering === false) {
+            //rendering = true;
+            //currentOp = renderQueue.pop();
+
+            let room = ops.get("room");
+
+            if(op === "setInv"){
+                setInvCol(ops.get(op));
             }
-            //TODO
-        },
-        setQuantity: (upordown, id, cost) => {
-            let str = '#' + id + 'BM input';
-            let str2 = '#' + id + 'BM .buyItemTotal';
-            let value = parseInt($(str).val());
-            let total = parseInt($('#buyTotalAmount').text());
-            let itemTotal;
-            if (upordown == 'up' && !((total + cost) > player.getMunny())) {
-                value++;
-                total += cost;
-            } else if (upordown == 'down') {
-                if (value <= 0)
-                    value = 0;
-                else {
-                    value--;
-                    total -= cost;
-                }
+            else if(op === "updateInv"){
+                if(ops.get(op))
+                updateInvColItem(ops.get(op)[0].getItem(), ops.get(op)[0].getCount(), ops.get(op)[1]);
             }
-            itemTotal = value * cost;
-            $(str).val(value);
-            $(str2).text(itemTotal);
-            $('#buyTotalAmount').text(total);
-        },
-        selectIcon: (type) => { //icons from http://game-icons.net
-            switch (type) {
-                case "ing":
-                    return "<img src='img/tree-branch.png'>";
-                default:
-                    return "<img src='img/locked-chest.png'>";
+            else if(op === "removeInv"){
+                removeFromInvCol(ops.get(op));
             }
+            else if(op === "mode"){
+                changeMode(ops.get(op));
+            }
+            if (mode === "roam") {
+                loadRoom(room);
+            } else if (mode === "shop") {
+                loadShop(room);
+            }
+            //}
+
         }
 
     }

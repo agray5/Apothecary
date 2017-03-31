@@ -30,15 +30,15 @@
         let lobby = Room("Lobby", "img/lobby.jpg", null, "This room could easily fit hundered people all scurring to complete one task or another. It was rare to see any royalty come this way as this is considered to be an extension of the castle workers living quarters. " +
             " It would be hard to complain though. Rays of sunlight stream through the high widows and sometimes small birds would fly in, chirping a merry song. The smell of freshly made food could be smelt from the nearby kitchen.", null, null, "This room could easily fit hundered people all scurring to complete one task or another. It was rare to see any royalty come this way as this is considered to be an extension of the castle workers living quarters. " +
             " It would be hard to complain though. The hall looked breathtaking at night. Streams of cool moonlight filter in through the widows, while colorful laterns have been lit along the walls bathing the hall in a myriad of colors.");
-        let shop = Room("Your Shop",  "img/shop.png", null, "A sparse shop with cabinets lined agianst the back wall holding your products. In front of the cabinets is a bar with comfy looking stools for patrons to sit at. Going through the employees only door will lead into the inner bar area while the door to the east leads out. ");
+        let myShop = Room("Your Shop",  "img/shop.png", null, "A sparse shop with cabinets lined agianst the back wall holding your products. In front of the cabinets is a bar with comfy looking stools for patrons to sit at. Going through the employees only door will lead into the inner bar area while the door to the east leads out. ");
         let ingredientshop = Room("Ingredient Shop",  "img/ingShop.jpg", null, "A sparse shop with cabinets lined agianst the back wall holding your products. In front of the cabinets is a bar with comfy looking stools for patrons to sit at.");
         /* exits */
         bedRoom.addExits([Exit("Bedroom", bedRoom), Exit(E, platform)]);
         hallway.addExits([Exit("Bedroom", bedRoom), Exit(E, platform)]);
         closet.addExits([Exit(NE, bedRoom)]);
         platform.addExits([Exit(W, hallway), Exit("Down", lobby, "You walk down the stairway and into the lobby.")]);
-        lobby.addExits([Exit("Up", platform, "You walk up the staircase and onto the platform."), Exit(shop.name, shop), Exit("Ingredient Shop", ingredientshop)]);
-        shop.addExits([Exit("Employees Only Door", null), Exit("Out", lobby)]);
+        lobby.addExits([Exit("Up", platform, "You walk up the staircase and onto the platform."), Exit(myShop.getName(), myShop), Exit("Ingredient Shop", ingredientshop)]);
+        myShop.addExits([Exit("Employees Only Door", null), Exit("Out", lobby)]);
         ingredientshop.addExits([Exit("Out", lobby) ]);
         
         
