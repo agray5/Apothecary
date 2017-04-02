@@ -181,6 +181,10 @@ const Graphics = () => {
         }
     }
 
+    const toggleTalk = (actor) => {
+        //TODO
+    }
+
     const loadShop = (room) => { //Handles loading a shops graphics
         //check if room has attached shop
         if (!room.isShop()) {
@@ -248,26 +252,36 @@ const Graphics = () => {
             //rendering = true;
             //currentOp = renderQueue.pop();
 
-            let room = ops.get("room");
+            let data = ops.get(op);
 
-            if(op === "setInv"){
-                setInvCol(ops.get(op));
+            if (op === "setInv") {
+                setInvCol(data);
+            } else if (op === "updateInv") {
+                if (data.length < 2) {
+                    data[1] = false;
+                }
+                updateInvColItem(data[0].getItem(), data[0].getCount(), data[1]);
+            } else if (op === "removeInv") {
+                removeFromInvCol(data);
+            } else if (op === "mode") {
+                changeMode(data);
+            } else if (op === "load_page") {
+                let room, mode;
+                if (data.length === 1) {
+                    room = data[0];
+                } else {
+                    mode = data[1];
+                    changeMode(mode);
+                }
+                if (mode === "roam") {
+                    loadRoom(room);
+                } else if (mode === "shop") {
+                    loadShop(room);
+                }
+            } else if (op === "talking") {
+                toggleTalk(data);
             }
-            else if(op === "updateInv"){
-                if(ops.get(op))
-                updateInvColItem(ops.get(op)[0].getItem(), ops.get(op)[0].getCount(), ops.get(op)[1]);
-            }
-            else if(op === "removeInv"){
-                removeFromInvCol(ops.get(op));
-            }
-            else if(op === "mode"){
-                changeMode(ops.get(op));
-            }
-            if (mode === "roam") {
-                loadRoom(room);
-            } else if (mode === "shop") {
-                loadShop(room);
-            }
+
             //}
 
         }

@@ -6,12 +6,12 @@ const gController = (graphics_, player_) => {
 
     return {
         init: () => {
-            operations.set("room", player.getCurrentRoom());
+            operations.set("load_page", player.getCurrentRoom()); // data can be a list [room, mode_change], only one is assumed to be room
             operations.set("setInv", player.getInv());
-            operations.set("updateInv", [null, false]);
+            operations.set("updateInv", [null, false]); // data is [invItem, newItem], if newItem is not included it is assumed to be false
             operations.set("removeInv", null);
             operations.set("mode", "roam");
-            operations.set("talking", false);
+            operations.set("talking", null); // data is null if toggling off, but needs an actor to toggle on
         },
         update: (operation, data) => {
             if (operation === "mode") {
@@ -25,6 +25,7 @@ const gController = (graphics_, player_) => {
                 console.warn("Warning: cannot update graphics. " + operation + " is undefined");
                 return false;
             }
+
             operations.set(operation, data);
             graphics.render(operation, operations);
         }
