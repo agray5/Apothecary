@@ -28,7 +28,8 @@
                  invMap = i;
              }
          }
-         updateInvColItem(item, invMap.getCount(), isNew);
+         gcon.update("updateInv", [invMap, isNew]);
+         //updateInvColItem(item, invMap.getCount(), isNew);
 
      }
 
@@ -103,8 +104,9 @@
              }
              subFromInv(item);
              currentRoom.addToTakableItems(item);
-             refreshActions(currentRoom);
-             lookAround(currentRoom);
+             gcon.update("refresh_textArea");
+             //refreshActions(currentRoom);
+             //lookAround(currentRoom);
          },
          take: (item) => {
              let index = currentRoom.getTakeableItems().indexOf(item);
@@ -112,8 +114,9 @@
              if (index !== -1) {
                  addToInv(item);
                  currentRoom.getTakeableItems().splice(index, 1); //Remove item from rooms takable items
-                 refreshActions(currentRoom);
-                 lookAround(currentRoom);
+                 gcon.update("refresh_textArea");
+                 //refreshActions(currentRoom);
+                 //lookAround(currentRoom);
              } else {
                  console.warn("Warning: The item is not in the actors current room");
              }
@@ -171,7 +174,8 @@
                      invMap = i;
                  }
              }
-             updateInvColItem(item, invMap.getCount(), isNew);
+             gcon.update("updateInv", [invMap, isNew]);
+             //updateInvColItem(item, invMap.getCount(), isNew);
          }
      }
 
@@ -192,9 +196,11 @@
                  i.remove(amount);
                  if (i.getCount() <= 0) { //There are no more of this item after it has been removed
                      inventory.splice(inventory.indexOf(i), 1);
-                     removeFromInvCol(item);
+                     gcon.update("removeInv", item);
+                     //removeFromInvCol(item);
                  } else {
-                     updateInvColItem(item, i.getCount()); //Update inventory text
+                     gcon.update("updateInv", [invMap]);
+                     //updateInvColItem(item, i.getCount()); //Update inventory text
                  }
                  return true;
              }
@@ -300,8 +306,9 @@
              }
              subFromInv(item);
              currentRoom.addToTakableItems(item);
-             refreshActions(currentRoom);
-             lookAround(currentRoom);
+             gcon.update("refresh_textArea");
+             //refreshActions(currentRoom);
+             //lookAround(currentRoom);
          },
          take: (item) => {
              let index = currentRoom.getTakeableItems().indexOf(item);
@@ -309,8 +316,9 @@
              if (index !== -1) {
                  addToInv(item);
                  currentRoom.getTakeableItems().splice(index, 1); //Remove item from rooms takable items
-                 refreshActions(currentRoom);
-                 lookAround(currentRoom);
+                 gcon.update("refresh_textArea");
+                 //refreshActions(currentRoom);
+                 //lookAround(currentRoom);
              } else {
                  console.warn("Warning: The item is not in the actors current room");
              }

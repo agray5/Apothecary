@@ -2,37 +2,47 @@ const Graphics = () => {
     let rendering = false;
     let renderQueue = [];
     let mode;
+    const divs = ["roam", "shop", "mainMenu", "newGame"]; //game modes
 
     //Will load a rooms actions based on context of room
-    const loadActionsBasedOnRoom = (room) => {
+    const loadActionsBasedOnRoom = (room = null) => {
         if (mode = "roam") {
-            if (room.getNpcs() !== null && room.getNpcs().length > 0) { //Only get talk option if npcs are in room
-                $(".action ul").append('<li id="talk"><a href="#">Talk To</li>');
-            }
-            if (room.getTakeableItems() !== null && room.getTakeableItems().length > 0) { //Only get take option if takable items are in room
-                $(".action ul").append('<li id="take"><a href="#">Take</li>');
-            }
-            if (room.getExamineableItems() !== null && room.getExamineableItems().length > 0) { //Only get examine option if examinable objects are in room
-                $(".action ul").append('<li id="examine"><a href="#">Examine</li>');
-            }
-            if (room.isShop()) //Only get shop option if the room connects to a shop
-                $(".action ul").append('<li id="shop"><a href="#">Shop</li>');
+            if (room === null) {
+                console.warn("Warning: could not load actions for room. Room is null");
+            } else {
+                if (room.getNpcs() !== null && room.getNpcs().length > 0) { //Only get talk option if npcs are in room
+                    $(".action ul").append('<li id="talk"><a href="#">Talk To</li>');
+                }
+                if (room.getTakeableItems() !== null && room.getTakeableItems().length > 0) { //Only get take option if takable items are in room
+                    $(".action ul").append('<li id="take"><a href="#">Take</li>');
+                }
+                if (room.getExamineableItems() !== null && room.getExamineableItems().length > 0) { //Only get examine option if examinable objects are in room
+                    $(".action ul").append('<li id="examine"><a href="#">Examine</li>');
+                }
+                if (room.isShop()) //Only get shop option if the room connects to a shop
+                    $(".action ul").append('<li id="shop"><a href="#">Shop</li>');
 
-            $(".action ul").append('<li id="look"><a href="#">Look Around</li>'); //The player should always have the option to look around if in a room
+                $(".action ul").append('<li id="look"><a href="#">Look Around</li>'); //The player should always have the option to look around if in a room
+            }
         }
+
     }
     //Allows us to switch on only the appropriate div
-    const changeMode = (mode_) => {
-        let str = "#" + mode;
+    const changeMode = (mode_ = null) => {
+        if(mode === null){
+            console.warn("Warning: cannot change mode. mode is null");
+        }
+        else{
+            mode = mode_;
+            let str = "#" + mode;
+            $(str).removeClass("dontDisplay");
 
-        mode = mode_;
-        $(str).removeClass("dontDisplay");
-
-        for (let d of divs) {
-            if (mode !== d) {
-                str = "#" + d;
-                if (!$(str).hasClass('dontDisplay'))
-                    $(str).addClass('dontDisplay');
+            for (let d of divs) {
+                if (mode !== d) {
+                    str = "#" + d;
+                    if (!$(str).hasClass('dontDisplay'))
+                        $(str).addClass('dontDisplay');
+                }
             }
         }
     }
@@ -267,9 +277,13 @@ const Graphics = () => {
                 changeMode(data);
             } else if (op === "load_page") {
                 let room, mode;
-                if (data.length === 1) {
+                if (data.length === undefined){
+                    room = data;
+                }
+                else if (data.length === 1) {
                     room = data[0];
                 } else {
+                    room = data[0];
                     mode = data[1];
                     changeMode(mode);
                 }
@@ -280,10 +294,16 @@ const Graphics = () => {
                 }
             } else if (op === "talking") {
                 toggleTalk(data);
+            } else if (op === "refresh_textArea") {
+                refreshActions(data);
+                //TODO Add refresh text
             }
 
             //}
 
+        },
+        getDivs: () => {
+            return divs;
         }
 
     }

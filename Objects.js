@@ -54,4 +54,4 @@
          'You are not required to complete these, but they pay a higher amount and if you fail they may be required to seek help else where. This may inevitably hurt your reputation and negativly impact your status. ',
          'With enough negative reports I may be forced to lower your rank. I know that it may be a lot to take in right now but I am sure you will get the hang of it.'
          ])
-        let Aierith = Actor("Aierith", AierithIntro, "img/Aierith.png");
+        let Aierith = Actor("Aierith", AierithIntro, "img/Aierith.png", [AierithIntro], 100, bedRoom);

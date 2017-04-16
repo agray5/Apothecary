@@ -6,7 +6,7 @@
         let resizeToggle = false;
         let player;
         let graphics; //graphics
-        let gCon; //graphics controller
+        //let gCon; //graphics controller
 
         /********** Functions ***********/
 
@@ -476,11 +476,12 @@
 
         /********** Main ***********/
         window.onload = function () {
-            player = Player("me", shop, 100);
             graphics = Graphics();
-            gCon = gController(graphics, player);
-            gCon.init();
+            player = Player("me", bedRoom, 100);
+            gcon.init(graphics, player);
             player.addToInv(comb);
             player.drop(comb);
+
+            gcon.update("load_page", [player.getCurrentRoom(), "roam"]);
             //preGameinit();
         }

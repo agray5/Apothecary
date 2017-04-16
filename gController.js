@@ -1,33 +1,45 @@
-const gController = (graphics_, player_) => {
-    const player = player_;
-    const graphics = graphics_;
-    const modes = ["roam", "shop", "mainMenu", "newGame"];
-    let operations = new Map();
+const gController = () => {
+    let graphics; //Graphics object
+    let modes;
+    let operations = new Map(); //contains operations and matching data for graphics state to render
+    let player;
 
     return {
-        init: () => {
+        init: (graphics_, player_) => {
+            graphics = graphics_;
+            player = player_;
+            modes = graphics.getDivs();
             operations.set("load_page", player.getCurrentRoom()); // data can be a list [room, mode_change], only one is assumed to be room
-            operations.set("setInv", player.getInv());
+            operations.set("setInv", player.getInv()); //data should be am arrary of invmaps
             operations.set("updateInv", [null, false]); // data is [invItem, newItem], if newItem is not included it is assumed to be false
-            operations.set("removeInv", null);
-            operations.set("mode", "roam");
+            operations.set("removeInv", null); // data is item
+            operations.set("mode", "roam"); //set game mode
             operations.set("talking", null); // data is null if toggling off, but needs an actor to toggle on
+            operations.set("refresh_textArea", player.getCurrentRoom()); //data is the current room of the player
         },
         update: (operation, data) => {
             if (operation === "mode") {
-                if(!modes.includes(data)){
+                if(!modes.includes(data)){ //Can only set mode to an appoved mode setting
                     console.warn("Warning: cannot set mode in graphics. Mode " + data + " is undefined.");
                     return false;
                 }
             }
             
-            if (operations.get(operation) === undefined) {
+            if (operations.get(operation) === undefined) { //Can only set exsisting operations
                 console.warn("Warning: cannot update graphics. " + operation + " is undefined");
                 return false;
             }
+
+            if(operation === "refresh_textArea"){//Refresh text area will always take the players current room, so there is no reason to have to specify it
+                data = player.getCurrentRoom(); //data should always be players current room
+            }
+
+            
 
             operations.set(operation, data);
             graphics.render(operation, operations);
         }
     }
 }
+
+const gcon = gController(); //create graphics controller for other classes to use. There should only one graphics controller
