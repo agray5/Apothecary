@@ -2,8 +2,12 @@ const Graphics = () => {
     let rendering = false;
     let renderQueue = [];
     let mode;
-    const divs = ["roam", "shop", "mainMenu", "newGame"]; //game modes
+    let limitInteractionMode = false;
+    const divs = ["roam", "shop", "mainMenu", "startNewGame"]; //game modes
+    let resizeToggle = false;
 
+    $("#nameBox").toggle();
+    
     //Will load a rooms actions based on context of room
     const loadActionsBasedOnRoom = (room = null) => {
         if (mode = "roam") {
@@ -16,7 +20,7 @@ const Graphics = () => {
                 if (room.getTakeableItems() !== null && room.getTakeableItems().length > 0) { //Only get take option if takable items are in room
                     $(".action ul").append('<li id="take"><a href="#">Take</li>');
                 }
-                if (room.getExamineableItems() !== null && room.getExamineableItems().length > 0) { //Only get examine option if examinable objects are in room
+                if (room.getExaminableItems() !== null && room.getExaminableItems().length > 0) { //Only get examine option if examinable objects are in room
                     $(".action ul").append('<li id="examine"><a href="#">Examine</li>');
                 }
                 if (room.isShop()) //Only get shop option if the room connects to a shop
@@ -29,10 +33,9 @@ const Graphics = () => {
     }
     //Allows us to switch on only the appropriate div
     const changeMode = (mode_ = null) => {
-        if(mode === null){
+        if (mode === null) {
             console.warn("Warning: cannot change mode. mode is null");
-        }
-        else{
+        } else {
             mode = mode_;
             let str = "#" + mode;
             $(str).removeClass("dontDisplay");
@@ -142,7 +145,7 @@ const Graphics = () => {
                     container: 'body',
                 })
                 .on("mouseenter", function () {
-                    if (!talking) {
+                    if (!limitInteractionMode) {
                         let _this = this;
                         $(this).popover("show");
                         $(".popover").on("mouseleave", function () {
@@ -191,8 +194,80 @@ const Graphics = () => {
         }
     }
 
+    const turnPageFwd = () => {
+        let state = player.getInteractingWith().getCurrentState();
+        let currentPage = player.getInteractingWith().getCurrentState().getCurrentPage();
+        if (currentPage < state.getPages().length) {
+            state.pageFwd();
+            $(".textBox").text(state.readPage());
+        }
+        if (currentPage == state.getPages().length - 1) {
+            removeAction("next");
+            addAction("endConvo", "Goodbye");
+        } else if (currentPage == 1) {
+            addAction("prev", "Previous");
+            removeAction("next");
+            addAction("next", "Next");
+        }
+    }
+
+    const turnPagePre = () => {
+        let state = player.getInteractingWith().getCurrentState();
+        let currentPage = player.getInteractingWith().getCurrentState().getCurrentPage();
+        if (currentPage > 0) {
+            state.pagePev();
+            $(".textBox").text(state.readPage());
+        }
+        if (currentPage == 0) {
+            removeAction("prev");
+        } else if (currentPage == state.getPages().length - 2) {
+            addAction("next", "Next");
+        }
+    }
+
+    const resizeTextArea = () => {
+        $(this).toggleClass('glyphicon-resize-full').toggleClass('glyphicon-resize-small');
+        if (!resizeToggle) {
+            $(".bottomOfScreen").css("top", "25%");
+            $(".textBox").css("top", "10px");
+            $(".textBox").css("bottom", "");
+            resizeToggle = true;
+        } else {
+            $(".bottomOfScreen").css("top", "");
+            $(".textBox").css("bottom", "10px");
+            $(".textBox").css("top", "");
+            resizeToggle = false;
+        }
+    }
+
     const toggleTalk = (actor) => {
-        //TODO
+        $(".bottomOfScreen").attr('id', ($(".bottomOfScreen").attr('id') == 'bottomText' ? 'talkingText' : 'bottomText'));
+        $("#playerAvatar").toggle();
+        $("#resizeBtn").toggle();
+        $("#nameBox").toggle();
+        console.log("toggle talk");
+        if (!limitInteractionMode) {
+            limitInteractionMode = true;
+            $("#nameBoxText").text(actor.getName());
+            $(".textBox").text(actor.getStartState().getPages()[0]);
+            $("#npcCutOut").append("<img src='" + actor.getCutOut() + "'>");
+            $(".action ul").empty();
+            if (actor.getStartState().getPages().length > 1)
+                addAction("next", "Next");
+            $(".textBox").css("font-size", "26px");
+            $(".textBox").css("bottom", "");
+            $(".textBox").css("top", "");
+        } else {
+            limitInteractionMode = false;
+            $("#npcCutOut").empty();
+            $(".textBox").css("font-size", "18px");
+            if (!resizeToggle)
+                $(".textBox").css("bottom", "10px");
+            else
+                $(".textBox").css("top", "10px");
+            refreshRoom(null);
+            scrollTextUp();
+        }
     }
 
     const loadShop = (room) => { //Handles loading a shops graphics
@@ -201,7 +276,7 @@ const Graphics = () => {
             console.warn("Warning: Cannot load room as a shop. It is not a shop");
             return false;
         }
-        //selct shop div
+        //select shop div
         changeMode("shop");
         //load shop inv
         for (let i of room.getShop().getInv()) {
@@ -276,27 +351,32 @@ const Graphics = () => {
             } else if (op === "mode") {
                 changeMode(data);
             } else if (op === "load_page") {
-                let room, mode;
-                if (data.length === undefined){
+                let room, exitMsg;
+                if (data.length === undefined) { //data is only room 
                     room = data;
-                }
-                else if (data.length === 1) {
+                } else if (data.length === 1) { //data is a list but only has one value
                     room = data[0];
-                } else {
+                } else { //list has multiple values
                     room = data[0];
-                    mode = data[1];
-                    changeMode(mode);
+                    exitMsg = data[1];
                 }
                 if (mode === "roam") {
-                    loadRoom(room);
+                    loadRoom(room, exitMsg);
                 } else if (mode === "shop") {
                     loadShop(room);
                 }
             } else if (op === "talking") {
-                toggleTalk(data);
+                if (data === "prev")
+                    turnPagePre();
+                else if (data === "next")
+                    turnPageFwd();
+                else
+                    toggleTalk(data);
             } else if (op === "refresh_textArea") {
                 refreshActions(data);
                 //TODO Add refresh text
+            } else if (op === "toggle_textArea") {
+                resizeTextArea();
             }
 
             //}

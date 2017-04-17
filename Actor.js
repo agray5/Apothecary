@@ -7,7 +7,7 @@
      let inventory = inv; //The actors inventory
      let currentRoom = startRoom; //The current room of the actor
      let munny = munny_; //The amount of munny on the actor
-     
+
      const addToInv = (item, amount = 1) => {
          let isNew = false;
          let count = 0;
@@ -149,7 +149,7 @@
      }
 
      const addToInv = (item, amount = 1) => {
-         //Check if item is a equipment or an ingrediant 
+         //Check if item is a equipment or an ingredient 
          if (item.getType() == "equip") {
              equipment.push(item);
          } else if (item.getType() == "ing") {
@@ -186,11 +186,9 @@
              if (equipped.indexOf(item) != -1) {
                  unequip(item);
              }
-         } 
-         else if (item.getType() == "ing") {
+         } else if (item.getType() == "ing") {
              ingChest.splice(ingChest.indexOf(item), 1);
-         } 
-         else {
+         } else {
              let i = findInvItem(item);
              if (inventory.indexOf(i) !== -1) { //Item is in inventory
                  i.remove(amount);
@@ -204,9 +202,13 @@
                  }
                  return true;
              }
-             console.warn("Warning: item: " + item.getName() + " could not be subtracted from players's inventory. item: " + item.getName() + " does not exsist in player's inventory.");
+             console.warn("Warning: item: " + item.getName() + " could not be subtracted from players's inventory. item: " + item.getName() + " does not exist in player's inventory.");
              return false;
          }
+     }
+
+     const setTalking = (bool) => {
+         talking = bool;
      }
 
      return {
@@ -258,9 +260,10 @@
          updateOutsideFlag: () => {
              isOutside = currentRoom.isOutside();
          },
-         setTalking: (bool) => {
-             talking = bool;
+         setName: (name_ = name) => {
+             name = name_;
          },
+         setTalking,
          setMunny: (amount = 0) => {
              munny = amount;
          },
@@ -270,7 +273,7 @@
          setCurrentRoom: (room = currentRoom) => {
              currentRoom = room;
          },
-         startInteraction: (actor = null, action = null) => {
+         startInteraction: (actor = null, action = null) => { //Player interaction with NPC 
              if (actor === null || action === null) {
                  console.warn("Warning: player cannot start interaction. Both actor and action must be specified.");
                  return false;
@@ -288,10 +291,10 @@
                  }
              }
          },
-         stopInteraction: () => {
+         stopInteraction: () => { //Stop player interaction with NPC
              interactingWith = null;
              interaction = null;
-             settalking(false);
+             setTalking(false);
          },
          addMunny: (amount = 1) => {
              munny += amount;
@@ -376,7 +379,7 @@
              return false;
          },
          pagePev: () => {
-             if (currentPage != 0) { //Dont move page foward if it is first page
+             if (currentPage != 0) { //Dont move page forward if it is first page
                  currentPage--;
                  return true;
              }
@@ -385,3 +388,5 @@
          }
      }
  };
+
+ let player = Player(); //player variable

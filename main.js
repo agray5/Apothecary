@@ -3,8 +3,6 @@
         let timeOfDay = "morning";
         const rate = 0.5;
         let turns = 0;
-        let resizeToggle = false;
-        let player;
         let graphics; //graphics
         //let gCon; //graphics controller
 
@@ -14,16 +12,21 @@
 
         //based on current room, proper room connecter
         const changeRoom = (room, exitMsg) => {
+            let currentRoom = player.getCurrentRoom();
+            //A turn is taken when changing rooms
             takeTurn();
+            //Update players current room
+            player.setCurrentRoom(room);
             //Is the player outside?
             player.updateOutsideFlag();
             //blank saved text
             currentRoom.setSavedText([]);
+            //Load the room
+            gcon.update("load_page", [room, exitMsg]);
             //Player has seen the room
             if (!currentRoom.getHasSeen())
                 currentRoom.seenRoom();
-            //Load the room
-            loadRoom(room, exitMsg);
+            //loadRoom(room, exitMsg);
         };
 
 
@@ -227,65 +230,15 @@
 
         /* Talking */
         const toggleTalk = (actor) => {
-            let talking = player.isTalking();
-            $(".bottomOfScreen").attr('id', ($(".bottomOfScreen").attr('id') == 'bottomText' ? 'talkingText' : 'bottomText'));
-            $("#playerAvatar").toggle();
-            $("#resizeBtn").toggle();
-            $("#nameBox").toggle();
-            console.log("toggle talk");
-            if (!talking) {
-                talking = true;
-                $("#nameBoxText").text(actor.getName());
-                $(".textBox").text(actor.getStartState().getPages()[0]);
-                $("#npcCutOut").append("<img src='" + actor.getCutOut() + "'>");
-                $(".action ul").empty();
-                if (actor.getStartState().getPages().length > 1)
-                    addAction("next", "Next");
-                $(".textBox").css("font-size", "26px");
-                $(".textBox").css("bottom", "");
-                $(".textBox").css("top", "");
+            if (player.isTalking()) {
+                player.stopInteraction();
+                gcon.update("talking", null);
             } else {
-                $("#npcCutOut").empty();
-                $(".textBox").css("font-size", "18px");
-                if (!resizeToggle)
-                    $(".textBox").css("bottom", "10px");
-                else
-                    $(".textBox").css("top", "10px");
-                refreshRoom(null);
-                scrollTextUp();
+                player.startInteraction(actor, "talking");
+                gcon.update("talking", actor);
             }
         }
 
-        const turnPageFwd = () => {
-            let state = player.getInteractingWith().getCurrentState();
-            let currentPage = player.getInteractingWith().getCurrentState().getCurrentPage();
-            if (currentPage < state.getPages().length) {
-                state.pageFwd();
-                $(".textBox").text(state.readPage());
-            }
-            if (currentPage == state.getPages().length - 1) {
-                removeAction("next");
-                addAction("endConvo", "Goodbye");
-            } else if (currentPage == 1) {
-                addAction("prev", "Previous");
-                removeAction("next");
-                addAction("next", "Next");
-            }
-        }
-
-        const turnPagePre = function () {
-            let state = player.getInteractingWith().getCurrentState();
-            let currentPage = player.getInteractingWith().getCurrentState().getCurrentPage();
-            if (currentPage > 0) {
-                state.pagePev();
-                $(".textBox").text(state.readPage());
-            }
-            if (currentPage == 0) {
-                removeAction("prev");
-            } else if (currentPage == state.getPages().length - 2) {
-                addAction("next", "Next");
-            }
-        }
 
         /* Actions */
         const lookAround = (room) => {
@@ -296,84 +249,7 @@
         $(".inv ul").find("a").on("click", function (event) {
             scrollText();
         });
-        /* Next Click */
-        $(".action").on("click", "#next", function (event) {
-            turnPageFwd();
-            console.log(currentPage);
-        });
 
-        /* Previous Click */
-        $(".action").on("click", "#prev", function (event) {
-            turnPagePre();
-            console.log(currentPage);
-        });
-
-        /* EndConvo Click */
-        $(".action").on("click", "#endConvo", function (event) {
-            toggleTalk();
-        });
-
-        /* Resize Click */
-        $("#resizeBtn").on("click", function (event) {
-            $(this).toggleClass('glyphicon-resize-full').toggleClass('glyphicon-resize-small');
-            if (!resizeToggle) {
-                $(".bottomOfScreen").css("top", "25%");
-                $(".textBox").css("top", "10px");
-                $(".textBox").css("bottom", "");
-                resizeToggle = true;
-            } else {
-                $(".bottomOfScreen").css("top", "");
-                $(".textBox").css("bottom", "10px");
-                $(".textBox").css("top", "");
-                resizeToggle = false;
-            }
-        });
-        /* Exit Click */
-        $(".exit").on("click", "li", function (event) {
-            if (!player.isTalking()) {
-                for (let e of player.getCurrentRoom().getExits()) {
-                    if (e.getDir() === this.getId()) {
-                        if (e.getNextRoom() == null) {
-                            throw new Error("Error: cannot go direction: " + e.getDir() + ". The next room is null");
-                        } else {
-                            player.setCurrentRoom(e.getNextRoom());
-                            if (e.getExitMsg() != null)
-                                changeRoom(e);
-                            else
-                                changeRoom();
-                        }
-                    }
-                }
-            }
-        });
-
-        /*action click */
-        $(".action").on("click", function (event) {
-            scrollText();
-        });
-
-        /* Look Click */
-        $(".action").on("click", "#look", function (event) {
-            lookAround();
-        });
-
-        /* Take Click */
-        $(".action").on("click", "#take", function (event) {
-            $(".action ul").empty();
-            for (let i of currentRoom.getTakeableItems()) {
-                $(".action ul").append('<li class = "takeable" id="' + i.getId() + '"><a href="#">' + i.getName() + '</a></li>');
-            }
-            $(".action ul").append('<li id="back"><button type="image" src="img/parch.png" class = "btn-custom" class="btn ">Back</button></li>');
-        });
-
-
-        /* Shop Click */
-        $(".action").on("click", "#shop", function (event) {
-            ingShopInit();
-            $("ingShopBackgound")
-            $("#ingShop").toggle();
-            $("#roam").toggle();
-        });
         //test button
         $("button").click(function () {
             //let win = window.open();
@@ -411,31 +287,7 @@
                 }
             }
         }
-        /* New Game Name Enter Click*/
-        $("#nameEnter").on("click", function (event) {
-            if ($('#nameterm').val() != '') {
-                enterName();
-            }
-        });
 
-        $('#nameterm').keypress(function (e) {
-            let keyPress = e.which;
-            if (keyPress == 13) {
-                enterName();
-            }
-        });
-
-
-        const enterName = () => {
-            if ($('#nameterm').val() != '') {
-                let name = $("#nameterm").val();
-                $("#startNewGame").toggle();
-                startGameInit(name);
-                $("#roam").toggle();
-            } else {
-                $("#nameterm").attr("placeholder", "Please enter a name");
-            }
-        }
 
 
         const preGameinit = () => {
@@ -452,15 +304,14 @@
             $(".Playername").text(player.getName());
         }
         const startGameInit = (name) => {
-            player = Player(name, bedRoom, 100);
-            player.getCurrentRoom().setHasSeen(false);
+            player.setName(name);
+            player.addToInv(comb);
             player.addToInv(brownShirt);
             player.addToInv(blueSkirt);
-            player.addToInv(comb);
             player.addToInv(key, 2);
-            changeRoom();
+            gcon.update("mode", "roam");
+            changeRoom(bedRoom);
             roamInit();
-            state = AierithIntro;
             toggleTalk(Aierith);
         }
         const ingShopInit = () => {
@@ -473,15 +324,13 @@
                 $(this).trigger("enterKey");
             }
         });
-
+ 
         /********** Main ***********/
         window.onload = function () {
             graphics = Graphics();
             player = Player("me", bedRoom, 100);
             gcon.init(graphics, player);
-            player.addToInv(comb);
-            player.drop(comb);
 
-            gcon.update("load_page", [player.getCurrentRoom(), "roam"]);
-            //preGameinit();
+            //gcon.update("mode", "mainMenu");
+            startGameInit("Anne");
         }

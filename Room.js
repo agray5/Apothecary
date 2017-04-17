@@ -84,7 +84,7 @@
          getTakeableItems: () => {
              return takeableItems;
          },
-         getExamineableItems: () => {
+         getExaminableItems: () => {
              return examinableItems;
          },
          setSavedText: (text) => {
