@@ -55,7 +55,7 @@
              return name;
          },
          getStartState: () => {
-             return startState;
+             return startState.getState();
          },
          getCutOut: () => {
              return cutOut
@@ -82,6 +82,9 @@
          getCurrentRoom: () => {
              return currentRoom;
          },
+         getCurrentState: () => {
+             return state.getState();
+         },
          getMunny: () => {
              return munny;
          },
@@ -90,6 +93,9 @@
          },
          setCurrentRoom: (room = currentRoom) => {
              currentRoom = room;
+         },
+         setCurrentState: (state_) => {
+             state = state_;
          },
          addMunny: (amount = 1) => {
              munny += amount;
@@ -353,13 +359,23 @@
      }
  };
 
- const State = (pages_ = ["Error: this is a blank page. This state has no pages in it."]) => {
+
+
+ const State = (pages_ = state=() =>{return ["Error: this is a blank page. This state has no pages in it."]}, vals_ = null) => {
      let pages = pages_;
      let currentPage = 0;
+     let vals = vals_;
+
+     const update = () => {
+         if(vals === null)
+            return pages();
+         return fillInFun(vals, pages);
+     }
 
      return {
          getPages: () => {
-             return pages;
+             pages = update();
+             return pages();
          },
          getCurrentPage: () => {
              return currentPage;
@@ -371,7 +387,7 @@
              currentPage = page;
          },
          pageFwd: () => {
-             if (currentPage != pages.length - 1) { //Dont move page foward if it is last page
+             if (currentPage != pages().length - 1) { //Dont move page foward if it is last page
                  currentPage++;
                  return true;
              }
@@ -389,4 +405,30 @@
      }
  };
 
- let player = Player(); //player variable
+ const fillInFun = (vals_, state_) => {
+     console.log("fill in state");
+     let vals = vals_;
+     let state = state_;
+     switch (vals.length) {
+         case 0:
+             return;
+             break;
+         case 1:
+             return state(eval(vals[0]));
+             break;
+         case 2:
+             return state(eval(vals[0]), eval(vals[1]));
+             break;
+         case 3:
+             return state(eval(vals[0]), eval(vals[1]), eval(vals[2]));
+             break;
+         case 4:
+             return state(eval(vals[0]), eval(vals[1]), eval(vals[2]));
+             break;
+         case 5:
+             return state(eval(vals[0]), eval(vals[1]), eval(vals[2]), eval(vals[3]));
+             break;
+         default:
+             console.warn("Warning: cannot fill in state.", vals.length, "values is not supported.");
+     }
+ }

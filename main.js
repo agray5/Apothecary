@@ -4,6 +4,7 @@
         const rate = 0.5;
         let turns = 0;
         let graphics; //graphics
+         let player; //player variable
         //let gCon; //graphics controller
 
         /********** Functions ***********/
