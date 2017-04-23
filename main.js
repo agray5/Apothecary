@@ -4,16 +4,17 @@
         const rate = 0.5;
         let turns = 0;
         let graphics; //graphics
-         let player; //player variable
-        //let gCon; //graphics controller
+        let player; //player variable
+        let events; //events
+        let gCon; //graphics controller
 
         /********** Functions ***********/
 
 
 
         //based on current room, proper room connecter
-        const changeRoom = (room, exitMsg) => {
-            let currentRoom = player.getCurrentRoom();
+        const changeRoom = (room, exitMsg = null, talkTo = null) => {
+            let currentRoom = player.getRoom();
             //A turn is taken when changing rooms
             takeTurn();
             //Update players current room
@@ -23,11 +24,18 @@
             //blank saved text
             currentRoom.setSavedText([]);
             //Load the room
-            gcon.update("load_page", [room, exitMsg]);
+            if(exitMsg === null){
+                gcon.update("load_page", [room]);
+            }
+            else
+                gcon.update("load_page", [room, exitMsg]);
             //Player has seen the room
-            if (!currentRoom.getHasSeen())
-                currentRoom.seenRoom();
-            //loadRoom(room, exitMsg);
+            if (talkTo == null) {
+                if (!currentRoom.getHasSeen())
+                    currentRoom.seenRoom();
+            }
+            else
+                toggleTalk(talkTo);
         };
 
 
@@ -232,6 +240,7 @@
         /* Talking */
         const toggleTalk = (actor) => {
             if (player.isTalking()) {
+                player.getInteractingWith().getState().setCurrentPage(0);
                 player.stopInteraction();
                 gcon.update("talking", null);
             } else {
@@ -278,18 +287,6 @@
         };
 
 
-        /* ToolTip Examine Click */
-        const examine = (item) => {
-            console.log('worked');
-            for (let i of inventory) {
-                if (i.getId() == item) {
-                    addText("You remove the " + i.getName() + " from your bag and examine it. " + i.getDesc());
-                    scrollText();
-                }
-            }
-        }
-
-
 
         const preGameinit = () => {
             // Get the element with id="defaultOpen" and click on it
@@ -311,9 +308,9 @@
             player.addToInv(blueSkirt);
             player.addToInv(key, 2);
             gcon.update("mode", "roam");
-            changeRoom(bedRoom);
+            changeRoom(bedRoom, null, Aierith);
             roamInit();
-            toggleTalk(Aierith);
+            //toggleTalk(Aierith);
         }
         const ingShopInit = () => {
             resetIngBuyMenu();
@@ -325,12 +322,14 @@
                 $(this).trigger("enterKey");
             }
         });
- 
+
         /********** Main ***********/
         window.onload = function () {
             graphics = Graphics();
             player = Player("me", bedRoom, 100);
+            gcon = gController();
             gcon.init(graphics, player);
+            events = Events(player, gcon);
 
             //gcon.update("mode", "mainMenu");
             startGameInit("Anne");

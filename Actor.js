@@ -75,7 +75,7 @@
              throw new Error("Error: actor does not have item ", item, " in their inventory");
              return false;
          },
-         getCurrentRoom: () => {
+         getRoom: () => {
              return currentRoom;
          },
          getState: () => {
@@ -90,7 +90,7 @@
          setCurrentRoom: (room = currentRoom) => {
              currentRoom = room;
          },
-         setCurrentState: (state_) => {
+         setState: (state_) => {
              state = state_;
          },
          addMunny: (amount = 1) => {
@@ -223,7 +223,7 @@
          getInv: () => {
              return inventory;
          },
-         getCurrentRoom: () => {
+         getRoom: () => {
              return currentRoom;
          },
          getMunny: () => {
@@ -294,10 +294,11 @@
              }
          },
          stopInteraction: () => { //Stop player interaction with NPC
+             if(interaction == "talking"){
+                setTalking(false);
+             }
              interactingWith = null;
-             interaction = null;
-             setTalking(false);
-             currentState.setCurrentPage(0);
+             interaction = null;    
          },
          addMunny: (amount = 1) => {
              munny += amount;
@@ -358,29 +359,24 @@
 
 
 
- const State = (pages = state = () => {
-     return ["Error: this is a blank page. This state has no pages in it."]
- }, vals = null) => {
+ const State = (pages = state = () => {return ["Error: this is a blank page. This state has no pages in it."]}, vals = null) => {
      let currentPage = 0;
 
      const update = () => {
          if (vals === null)
-             return pages();
+             return pages;
          return fillInFun(vals, pages);
      }
 
      return {
          getPages: () => {
-             console.log(pages);
-             pages = update();
-             return pages;
+             return update();
          },
          getCurrentPage: () => {
              return currentPage;
          },
          readPage: () => {
-             pages = update();
-             return pages[currentPage];
+             return update()[currentPage];
          },
          setCurrentPage: (page) => {
              currentPage = page;

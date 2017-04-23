@@ -1,8 +1,8 @@
- const Room = (name_, bkg_, initDesc_, exits_, morningDesc_, noonDesc_ = morningDesc_, eveningDesc_ = morningDesc_, nightDesc_ = morningDesc_, isOutside_ = false, shop_ = null, npcs_ = [], takeableItems_ = [], examinableItems_ = []) => {
+ const Room = (name_, bkg_, initDesc_, morningDesc_, noonDesc_ = morningDesc_, eveningDesc_ = morningDesc_, nightDesc_ = morningDesc_, isOutside_ = false, shop_ = null, npcs_ = [], takeableItems_ = [], examinableItems_ = []) => {
      let hasSeen = false;
      let savedText = [];
      let bkg = bkg_;
-     let exits = exits_;
+     let exits = null;
      let name = name_;
      let initDesc = initDesc_;
      let morningDesc = morningDesc_;

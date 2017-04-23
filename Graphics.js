@@ -195,16 +195,18 @@ const Graphics = () => {
     }
 
     const turnPageFwd = () => {
-        let state = player.getInteractingWith().getCurrentState();
-        let currentPage = player.getInteractingWith().getCurrentState().getCurrentPage();
-        if (currentPage < state.getPages().length) {
+        let state = player.getInteractingWith().getState();
+        let currentPage = state.getCurrentPage();
+        if (currentPage < state.getPages().length - 1) {
             state.pageFwd();
+            currentPage = state.getCurrentPage();
             $(".textBox").text(state.readPage());
         }
         if (currentPage == state.getPages().length - 1) {
             removeAction("next");
             addAction("endConvo", "Goodbye");
-        } else if (currentPage == 1) {
+        } 
+        if (currentPage == 1) {
             addAction("prev", "Previous");
             removeAction("next");
             addAction("next", "Next");
@@ -212,15 +214,18 @@ const Graphics = () => {
     }
 
     const turnPagePre = () => {
-        let state = player.getInteractingWith().getCurrentState();
-        let currentPage = player.getInteractingWith().getCurrentState().getCurrentPage();
+        let state = player.getInteractingWith().getState();
+        let currentPage = state.getCurrentPage();
         if (currentPage > 0) {
             state.pagePev();
+            currentPage = state.getCurrentPage();
             $(".textBox").text(state.readPage());
         }
         if (currentPage == 0) {
             removeAction("prev");
-        } else if (currentPage == state.getPages().length - 2) {
+        } 
+        if (currentPage == state.getPages().length - 2) {
+            removeAction("endConvo");
             addAction("next", "Next");
         }
     }
@@ -252,7 +257,6 @@ const Graphics = () => {
             $(".textBox").text(actor.getState().readPage());
             $("#npcCutOut").append("<img src='" + actor.getCutOut() + "'>");
             $(".action ul").empty();
-            console.log(actor.getState().getPages());
             if (actor.getState().getPages().length > 1)
                 addAction("next", "Next");
             $(".textBox").css("font-size", "26px");
@@ -266,7 +270,7 @@ const Graphics = () => {
                 $(".textBox").css("bottom", "10px");
             else
                 $(".textBox").css("top", "10px");
-            refreshRoom(null);
+            loadRoom(player.getRoom());
             scrollTextUp();
         }
     }

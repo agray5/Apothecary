@@ -14,6 +14,7 @@
         let brownShirt = Item("brown shirt", 3, "A floofy brown shirt", "A brown fluffy item lies scrunched up on the ground.", 10, "equip", "shirt", "img/shirtBrown.png", true, true);
         let blueSkirt = Item("blue skirt", 4, "A short blue skirt.", "A blue fluffy item lies scrunched up on the ground.", 15, "equip", "skirt", "img/skirtBlue.png", true, true);
         /* rooms */
+        /*const Room = (name_, bkg_, initDesc_, exits_, morningDesc_, noonDesc_ = morningDesc_, eveningDesc_ = morningDesc_, nightDesc_ = morningDesc_, isOutside_ = false, shop_ = null, npcs_ = [], takeableItems_ = [], examinableItems_ = []) => {*/
         //west wing rooms
         let bedRoom = Room("Bedroom", "img/bedroom.png", "Your new mentor gives you a gentle smile as she turns to leave you to get settled in your new room. Suddenly exhausted you take a seat on your bed. " +
             "Waves of tension flow down your body. Sure you had known a lot would be expected out of you, working at the royal castle, but you hadn't expected to already be in charge of so much. Your right hand idly plays with your " +
@@ -43,59 +44,17 @@
 
 
         /* Actors */
-        /*
-        const AierithIntro = () => { return { state: () => {return State(
-        [`So you must be the famous ${name}. I am Aierith, the apothecary master of the castle. I am in charge of the apothecary room and making sure all the royal medicine needs are met. `,
-         'As you can imagine this makes it difficult to also attend to the needs of the workers and other residents of the castle. Thats where you come in. You will be my assistant, of sorts. ',
-         'Don\'t look at me like that. I may of have heard good things about you but you just got here. You have to prove yourself first if you want full the privileges of the station.',
-         'For now you will start off with the rank of apprentice. While the royal members do not worry about the expenses of the medicine, as the house settles those accounts, the other residents will pay you directly.',
-         'To handle these operations you will be provided with a shop to operate out of. You will be fully responsible for your store, including making the medicines to stock it with and obtaining the herbs for the medicines themselves. ',
-         'You will get paid a weekly stipend, but if you do not meet a certain quota of sales your pay will be docked. In the same return if you have a particularly good week you may receive a bonus. ',
-         'You will also get to keep the coin from your patrons minus a tax deduction, of course. Once you are of a sufficient rank you may even receive requests from nobels or even members of the royal family. Missives for these will be delivered to you at daybreak.',
-         'You are not required to complete these, but they pay a higher amount and if you fail they may be required to seek help else where. This may inevitably hurt your reputation and negativly impact your status. ',
-         'With enough negative reports I may be forced to lower your rank. I know that it may be a lot to take in right now but I am sure you will get the hang of it.'
-        ])}}}
-        */
+        const AierithIntro = State(function (name) {
+            return [`So you must be the famous ${name}. I am Aierith, the apothecary master of the castle. I am in charge of the apothecary room and making sure all the royal medicine needs are met. `,
+                'As you can imagine this makes it difficult to also attend to the needs of the workers and other residents of the castle. Thats where you come in. You will be my assistant, of sorts. ',
+                'Don\'t look at me like that. I may of have heard good things about you but you just got here. You have to prove yourself first if you want full the privileges of the station.',
+                'For now you will start off with the rank of apprentice. While the royal members do not worry about the expenses of the medicine, as the house settles those accounts, the other residents will pay you directly.',
+                'To handle these operations you will be provided with a shop to operate out of. You will be fully responsible for your store, including making the medicines to stock it with and obtaining the herbs for the medicines themselves. ',
+                'You will get paid a weekly stipend, but if you do not meet a certain quota of sales your pay will be docked. In the same return if you have a particularly good week you may receive a bonus. ',
+                'You will also get to keep the coin from your patrons minus a tax deduction, of course. Once you are of a sufficient rank you may even receive requests from nobels or even members of the royal family. Missives for these will be delivered to you at daybreak.',
+                'You are not required to complete these, but they pay a higher amount and if you fail they may be required to seek help else where. This may inevitably hurt your reputation and negativly impact your status. ',
+                'With enough negative reports I may be forced to lower your rank. I know that it may be a lot to take in right now but I am sure you will get the hang of it.'
+            ]
+        }, ["player.getName()"]);
 
-/*
-
-        const AierithIntro = () => {
-            let vals = ["player.getName()"];
-
-            state = (name) => {
-                return State(
-                    [`So you must be the famous ${name}. I am Aierith, the apothecary master of the castle. I am in charge of the apothecary room and making sure all the royal medicine needs are met. `,
-                        'As you can imagine this makes it difficult to also attend to the needs of the workers and other residents of the castle. Thats where you come in. You will be my assistant, of sorts. ',
-                        'Don\'t look at me like that. I may of have heard good things about you but you just got here. You have to prove yourself first if you want full the privileges of the station.',
-                        'For now you will start off with the rank of apprentice. While the royal members do not worry about the expenses of the medicine, as the house settles those accounts, the other residents will pay you directly.',
-                        'To handle these operations you will be provided with a shop to operate out of. You will be fully responsible for your store, including making the medicines to stock it with and obtaining the herbs for the medicines themselves. ',
-                        'You will get paid a weekly stipend, but if you do not meet a certain quota of sales your pay will be docked. In the same return if you have a particularly good week you may receive a bonus. ',
-                        'You will also get to keep the coin from your patrons minus a tax deduction, of course. Once you are of a sufficient rank you may even receive requests from nobels or even members of the royal family. Missives for these will be delivered to you at daybreak.',
-                        'You are not required to complete these, but they pay a higher amount and if you fail they may be required to seek help else where. This may inevitably hurt your reputation and negativly impact your status. ',
-                        'With enough negative reports I may be forced to lower your rank. I know that it may be a lot to take in right now but I am sure you will get the hang of it.'
-                    ])
-            }
-            return {
-                state,
-                getState: () => {
-                    return fillInState(vals, state);
-                }
-            }
-        }
-*/
-
-const AierithIntro = State(function (name) {
-                return [`So you must be the famous ${name}. I am Aierith, the apothecary master of the castle. I am in charge of the apothecary room and making sure all the royal medicine needs are met. `,
-                        'As you can imagine this makes it difficult to also attend to the needs of the workers and other residents of the castle. Thats where you come in. You will be my assistant, of sorts. ',
-                        'Don\'t look at me like that. I may of have heard good things about you but you just got here. You have to prove yourself first if you want full the privileges of the station.',
-                        'For now you will start off with the rank of apprentice. While the royal members do not worry about the expenses of the medicine, as the house settles those accounts, the other residents will pay you directly.',
-                        'To handle these operations you will be provided with a shop to operate out of. You will be fully responsible for your store, including making the medicines to stock it with and obtaining the herbs for the medicines themselves. ',
-                        'You will get paid a weekly stipend, but if you do not meet a certain quota of sales your pay will be docked. In the same return if you have a particularly good week you may receive a bonus. ',
-                        'You will also get to keep the coin from your patrons minus a tax deduction, of course. Once you are of a sufficient rank you may even receive requests from nobels or even members of the royal family. Missives for these will be delivered to you at daybreak.',
-                        'You are not required to complete these, but they pay a higher amount and if you fail they may be required to seek help else where. This may inevitably hurt your reputation and negativly impact your status. ',
-                        'With enough negative reports I may be forced to lower your rank. I know that it may be a lot to take in right now but I am sure you will get the hang of it.'
-                    ]
-            }, ["player.getName()"]);
-            
         let Aierith = Actor("Aierith", AierithIntro, "img/Aierith.png", [AierithIntro], 100, bedRoom);
-
