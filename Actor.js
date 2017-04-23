@@ -1,6 +1,5 @@
- const Actor = (name_, startState_, cutOut_, states_ = [], munny_, startRoom, inv = []) => {
+ const Actor = (name_, startState, cutOut_, states_ = [], munny_, startRoom, inv = []) => {
      let name = name_;
-     let startState = startState_; //The initial state of the actor
      let state = startState; //current state
      let cutOut = cutOut_; //The sprite of the actor
      let states = states_; //The possible states of the actor
@@ -54,9 +53,6 @@
          getName: () => {
              return name;
          },
-         getStartState: () => {
-             return startState.getState();
-         },
          getCutOut: () => {
              return cutOut
          },
@@ -82,8 +78,8 @@
          getCurrentRoom: () => {
              return currentRoom;
          },
-         getCurrentState: () => {
-             return state.getState();
+         getState: () => {
+             return state;
          },
          getMunny: () => {
              return munny;
@@ -301,6 +297,7 @@
              interactingWith = null;
              interaction = null;
              setTalking(false);
+             currentState.setCurrentPage(0);
          },
          addMunny: (amount = 1) => {
              munny += amount;
@@ -361,26 +358,28 @@
 
 
 
- const State = (pages_ = state=() =>{return ["Error: this is a blank page. This state has no pages in it."]}, vals_ = null) => {
-     let pages = pages_;
+ const State = (pages = state = () => {
+     return ["Error: this is a blank page. This state has no pages in it."]
+ }, vals = null) => {
      let currentPage = 0;
-     let vals = vals_;
 
      const update = () => {
-         if(vals === null)
-            return pages();
+         if (vals === null)
+             return pages();
          return fillInFun(vals, pages);
      }
 
      return {
          getPages: () => {
+             console.log(pages);
              pages = update();
-             return pages();
+             return pages;
          },
          getCurrentPage: () => {
              return currentPage;
          },
          readPage: () => {
+             pages = update();
              return pages[currentPage];
          },
          setCurrentPage: (page) => {
@@ -405,30 +404,28 @@
      }
  };
 
- const fillInFun = (vals_, state_) => {
-     console.log("fill in state");
-     let vals = vals_;
-     let state = state_;
-     switch (vals.length) {
-         case 0:
-             return;
-             break;
-         case 1:
-             return state(eval(vals[0]));
-             break;
-         case 2:
-             return state(eval(vals[0]), eval(vals[1]));
-             break;
-         case 3:
-             return state(eval(vals[0]), eval(vals[1]), eval(vals[2]));
-             break;
-         case 4:
-             return state(eval(vals[0]), eval(vals[1]), eval(vals[2]));
-             break;
-         case 5:
-             return state(eval(vals[0]), eval(vals[1]), eval(vals[2]), eval(vals[3]));
-             break;
-         default:
-             console.warn("Warning: cannot fill in state.", vals.length, "values is not supported.");
-     }
+ const fillInFun = (vals, state) => {
+         switch (vals.length) {
+             case 0:
+                 return;
+                 break;
+             case 1:
+                 return state(eval(vals[0]));
+                 break;
+             case 2:
+                 return state(eval(vals[0]), eval(vals[1]));
+                 break;
+             case 3:
+                 return state(eval(vals[0]), eval(vals[1]), eval(vals[2]));
+                 break;
+             case 4:
+                 return state(eval(vals[0]), eval(vals[1]), eval(vals[2]));
+                 break;
+             case 5:
+                 return state(eval(vals[0]), eval(vals[1]), eval(vals[2]), eval(vals[3]));
+                 break;
+             default:
+                 console.warn("Warning: cannot fill in state.", vals.length, "values is not supported.");
+         }
+
  }

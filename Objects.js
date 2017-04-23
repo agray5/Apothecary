@@ -84,9 +84,8 @@
         }
 */
 
-const AierithIntro = State(tate = (name) => {
-                return State(
-                    [`So you must be the famous ${name}. I am Aierith, the apothecary master of the castle. I am in charge of the apothecary room and making sure all the royal medicine needs are met. `,
+const AierithIntro = State(function (name) {
+                return [`So you must be the famous ${name}. I am Aierith, the apothecary master of the castle. I am in charge of the apothecary room and making sure all the royal medicine needs are met. `,
                         'As you can imagine this makes it difficult to also attend to the needs of the workers and other residents of the castle. Thats where you come in. You will be my assistant, of sorts. ',
                         'Don\'t look at me like that. I may of have heard good things about you but you just got here. You have to prove yourself first if you want full the privileges of the station.',
                         'For now you will start off with the rank of apprentice. While the royal members do not worry about the expenses of the medicine, as the house settles those accounts, the other residents will pay you directly.',
@@ -95,7 +94,8 @@ const AierithIntro = State(tate = (name) => {
                         'You will also get to keep the coin from your patrons minus a tax deduction, of course. Once you are of a sufficient rank you may even receive requests from nobels or even members of the royal family. Missives for these will be delivered to you at daybreak.',
                         'You are not required to complete these, but they pay a higher amount and if you fail they may be required to seek help else where. This may inevitably hurt your reputation and negativly impact your status. ',
                         'With enough negative reports I may be forced to lower your rank. I know that it may be a lot to take in right now but I am sure you will get the hang of it.'
-                    ])
+                    ]
             }, ["player.getName()"]);
-        let Aierith = Actor("Aierith", AierithIntro(), "img/Aierith.png", [AierithIntro()], 100, bedRoom);
+            
+        let Aierith = Actor("Aierith", AierithIntro, "img/Aierith.png", [AierithIntro], 100, bedRoom);
 

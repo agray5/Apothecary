@@ -249,10 +249,11 @@ const Graphics = () => {
         if (!limitInteractionMode) {
             limitInteractionMode = true;
             $("#nameBoxText").text(actor.getName());
-            $(".textBox").text(actor.getStartState().getPages()[0]);
+            $(".textBox").text(actor.getState().readPage());
             $("#npcCutOut").append("<img src='" + actor.getCutOut() + "'>");
             $(".action ul").empty();
-            if (actor.getStartState().getPages().length > 1)
+            console.log(actor.getState().getPages());
+            if (actor.getState().getPages().length > 1)
                 addAction("next", "Next");
             $(".textBox").css("font-size", "26px");
             $(".textBox").css("bottom", "");
