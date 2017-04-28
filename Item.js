@@ -62,7 +62,7 @@
         }; // /Item
             
         //Mapping an item to an inventory count
-        const InvItem = (item_, amount = 1) => {
+        const InvItem = (item_ = null, amount = 1) => {
             let item = item_;
             let count = amount;
             
@@ -78,8 +78,11 @@
                 getItem : () => {
                     return item;
                 },
-                getId : (item) => {
+                getId : () => {
                   return item.getId();  
+                },
+                getDesc : () => {
+                  return item.getDesc();  
                 },
                 getCount : () => {
                     return count;

@@ -34,7 +34,7 @@
         let myShop = Room("Your Shop", "img/shop.png", null, "A sparse shop with cabinets lined against the back wall holding your products. In front of the cabinets is a bar with comfy looking stools for patrons to sit at. Going through the employees only door will lead into the inner bar area while the door to the east leads out. ");
         let ingredientshop = Room("Ingredient Shop", "img/ingShop.jpg", null, "A sparse shop with cabinets lined against the back wall holding your products. In front of the cabinets is a bar with comfy looking stools for patrons to sit at.");
         /* exits */
-        bedRoom.addExits([Exit("Bedroom", bedRoom), Exit(E, platform)]);
+        bedRoom.addExits([Exit(S, hallway), Exit(NW, closet)]);
         hallway.addExits([Exit("Bedroom", bedRoom), Exit(E, platform)]);
         closet.addExits([Exit(NE, bedRoom)]);
         platform.addExits([Exit(W, hallway), Exit("Down", lobby, "You walk down the stairway and into the lobby.")]);

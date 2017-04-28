@@ -93,9 +93,9 @@
          setHasSeen: (bool) => {
              hasSeen = bool;
          },
-         setTakableItems: (items = null) => {
+         setTakeableItems: (items = null) => {
              if (items === null) {
-                 console.warn("Warning: cannot set rooms takable items. Items is null");
+                 warning("Warning: cannot set rooms takable items. Items is null");
                  return false;
              }
              takeableItems = items;
@@ -103,16 +103,19 @@
          seenRoom: () => {
              hasSeen = true;
          },
-         addToTakableItems: (items = null) => {
+         addToTakeableItems: (items = null) => {
              if (items === null) {
-                 console.warn("Warning: cannot add to rooms takable items. Items is null");
+                 warning("Warning: cannot add to rooms takable items. Items is null");
                  return false;
              }
-             takeableItems.concat(items);
+             if (items.length > 1)
+                 takeableItems.concat(items);
+             else
+                 takeableItems.push(items);
          },
          subFromTakableItems: (items = null) => {
              if (items === null) {
-                 console.warn("Warning: cannot sub from rooms takable items. Items is null");
+                 warning("Warning: cannot sub from rooms takable items. Items is null");
                  return false;
              }
              for (let i of items) {
@@ -158,14 +161,14 @@
      return {
          setInv: (inv_) => {
              if (inv.length <= 0) {
-                 console.warn("Warning: could not set shop inventory. Inventory length is 0 or less");
+                 warning("Warning: could not set shop inventory. Inventory length is 0 or less");
                  return false;
              }
              inv = inv_;
          },
          addToInv: (items) => {
              if (items == null || items.length <= 0) {
-                 console.warn("Warning: cannot add to shops inventory if items is null or length is 0");
+                 warning("Warning: cannot add to shops inventory if items is null or length is 0");
                  return false;
              }
              inv.concat(items);
@@ -173,7 +176,7 @@
          removeFromInv: (items) => {
              for (let i of items) {
                  if (inv.indexOf(i) == -1) {
-                     console.warn("Warning: " + i + " is not in the shops inventory");
+                     warning("Warning: " + i + " is not in the shops inventory");
                  } else {
                      inv.splice(inv.indexOf(i), 1);
                  }

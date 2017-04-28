@@ -9,7 +9,9 @@
         let gCon; //graphics controller
 
         /********** Functions ***********/
-
+/*
+Note: fix drop function. Find inv map from item or id. 
+*/ 
 
 
         //based on current room, proper room connecter
@@ -18,23 +20,21 @@
             //A turn is taken when changing rooms
             takeTurn();
             //Update players current room
-            player.setCurrentRoom(room);
+            player.setRoom(room);
             //Is the player outside?
             player.updateOutsideFlag();
             //blank saved text
             currentRoom.setSavedText([]);
             //Load the room
-            if(exitMsg === null){
+            if (exitMsg === null) {
                 gcon.update("load_page", [room]);
-            }
-            else
+            } else
                 gcon.update("load_page", [room, exitMsg]);
             //Player has seen the room
             if (talkTo == null) {
                 if (!currentRoom.getHasSeen())
                     currentRoom.seenRoom();
-            }
-            else
+            } else
                 toggleTalk(talkTo);
         };
 
@@ -129,29 +129,15 @@
             //evt.currentTarget.className += " active";
         }
 
-        /* Journal Inventory */
-
-        const loadInvMenu = () => {
-            let inventory = player.getInv();
-            $("#invTable").append("<tr><th>Name</th><th>Value</th><th>Amount</th><th>Total Value</th></tr>")
-            for (let i of inventory) {
-                let total = i.getInvCount() * i.getValue();
-                $("#invTable").append('<tr id=' + i.getId() + 'IM><td>' + selectIcon(i.getType()) + "  " + i.getName() + '</td><td>' + i.getValue() + '</td><td>' + i.getInvCount() + '</td><td>' + total + '</td><td><button class="myBtn" id="jInvDrop" onclick="javascript:jInvDrop(' + i.getId() + ')">Drop</button></td></tr>');
-            }
-        }
-        const resetInvMenu = () => {
-            $("#invTable").empty();
-        }
-
-        const jInvDrop = (item) => {
-            dropItem(item);
-            resetInvMenu();
-            loadInvMenu();
+        const dropItem = (id) => {
+            let item = player.findInvItemFromId(id);
+            player.drop(item);
+            gcon.update("refresh_textArea");
         }
 
         /* Journal Equipment*/
         const equip = (id) => {
-            console.log("equipping,,");
+            console.log("equipping..");
             let sel, sel2, style1, style2, class_;
             for (let i of equipment) {
                 if (i.getId() == id) {
@@ -301,14 +287,15 @@
         const roamInit = () => {
             $(".Playername").text(player.getName());
         }
-        const startGameInit = (name) => {
-            player.setName(name);
+        const startGameInit = () => {
+            //player.setName(name);
             player.addToInv(comb);
             player.addToInv(brownShirt);
             player.addToInv(blueSkirt);
             player.addToInv(key, 2);
             gcon.update("mode", "roam");
-            changeRoom(bedRoom, null, Aierith);
+            //changeRoom(bedRoom, null, Aierith);
+            changeRoom(bedRoom, null);
             roamInit();
             //toggleTalk(Aierith);
         }
@@ -323,6 +310,16 @@
             }
         });
 
+        /* ToolTip Examine Click */
+        const examine = (item) => {
+            for (let i of player.getInv()) {
+                if (i.getId() == item) {
+                    gcon.update("add_text", "You remove the " + i.getName() + " from your bag and examine it. " + i.getDesc());
+                    scrollText();
+                }
+            }
+        }
+
         /********** Main ***********/
         window.onload = function () {
             graphics = Graphics();
@@ -332,5 +329,5 @@
             events = Events(player, gcon);
 
             //gcon.update("mode", "mainMenu");
-            startGameInit("Anne");
+            startGameInit();
         }

@@ -17,17 +17,18 @@ const gController = () => {
             operations.set("talking", null); // data is null if toggling off, but needs an actor to toggle on, special data "prev" and "next"
             operations.set("refresh_textArea", player.getRoom()); //data is the current room of the player
             operations.set("toggle_textArea", null); // doesnt need data
+            operations.set("add_text", "text"); // data should be text to be added66
         },
         update: (operation, data = null) => {
             if (operation === "mode") {
                 if(!modes.includes(data)){ //Can only set mode to an approved mode setting
-                    console.warn("Warning: cannot set mode in graphics. Mode " + data + " is undefined.");
+                    warning("Warning: cannot set mode in graphics. Mode " + data + " is undefined.");
                     return false;
                 }
             }
             
             if (operations.get(operation) === undefined) { //Can only set existing operations
-                console.warn("Warning: cannot update graphics. " + operation + " is undefined");
+                warning("Warning: cannot update graphics. " + operation + " is undefined");
                 return false;
             }
 

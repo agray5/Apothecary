@@ -7,12 +7,12 @@ const Graphics = () => {
     let resizeToggle = false;
 
     $("#nameBox").toggle();
-    
+
     //Will load a rooms actions based on context of room
     const loadActionsBasedOnRoom = (room = null) => {
         if (mode = "roam") {
             if (room === null) {
-                console.warn("Warning: could not load actions for room. Room is null");
+                warning("Warning: could not load actions for room. Room is null");
             } else {
                 if (room.getNpcs() !== null && room.getNpcs().length > 0) { //Only get talk option if npcs are in room
                     $(".action ul").append('<li id="talk"><a href="#">Talk To</li>');
@@ -34,7 +34,7 @@ const Graphics = () => {
     //Allows us to switch on only the appropriate div
     const changeMode = (mode_ = null) => {
         if (mode === null) {
-            console.warn("Warning: cannot change mode. mode is null");
+            warning("Warning: cannot change mode. mode is null");
         } else {
             mode = mode_;
             let str = "#" + mode;
@@ -67,6 +67,30 @@ const Graphics = () => {
         $(".action ul").empty();
     }
 
+    const flushTextArea = () => {
+        $(".textBox").empty();
+    }
+
+    const getRoomInfo = (room = null) => {
+        if (room === null) {
+            warning("Warning: cannot fill in room info. Room is null");
+            return false;
+        }
+
+        //Add Room Desc
+        if (!room.getHasSeen() && room.getInitDesc() !== null) {
+            addText(room.getInitDesc());
+        } else {
+            addText(room.getDesc());
+        }
+        //Add Takeable items to description
+        if (room.getTakeableItems() != null && room.getTakeableItems().length > 0) {
+            for (let i of room.getTakeableItems()) {
+                addText('\n <span class="inTextBox" id="' + i.getId() + 'inRoom">' + i.getInRoomDesc() + "</span>");
+            }
+        }
+    }
+
     const addText = (text) => {
         $(".textBox").append("<p>" + text + "</p>");
     }
@@ -91,7 +115,7 @@ const Graphics = () => {
     //Should be a list of invItem 
     const setInvCol = (inv = null) => {
         if (invMap === null) {
-            console.warn("Warning: cannot set inventory column. invMap cannot be null");
+            warning("Warning: cannot set inventory column. invMap cannot be null");
             return false;
         }
 
@@ -133,7 +157,7 @@ const Graphics = () => {
                 actionLinks += '<a id=&quot;eat&quot; href=&quot;#&quot;>Eat</a><br>';
             }
             actionLinks += '<a id=&quot;examine&quot; href=&quot;javascript:examine(' + item.getId() + ')&quot;>Examine</a><br>';
-            actionLinks += '<a d=&quot;drop&quot; href=&quot;javascript:dropItem(' + item.getId() + ')&quot;>Drop</a>';
+            actionLinks += '<a id=&quot;drop&quot; href=&quot;javascript:dropItem(' + item.getId() + ')&quot;>Drop</a>';
             //Create popover for new listing
             $(".inv ul").append("<li id=\"" + item.getId() + "\"><a class='pop' data-content='" + actionLinks + "'  data-toggle='popover' href='#' title='' data-original-title     rel='popover'><span class='itemText'>" + itemText + '</span></a></li>');
             //Set up popover for inventory item
@@ -161,6 +185,19 @@ const Graphics = () => {
                     }, 30);
                 });
         }
+    }
+
+    /* Journal Inventory */
+    const loadJInvMenu = () => {
+        let inventory = player.getInv();
+        $("#invTable").append("<tr><th>Name</th><th>Value</th><th>Amount</th><th>Total Value</th></tr>")
+        for (let i of inventory) {
+            let total = i.getInvCount() * i.getValue();
+            $("#invTable").append('<tr id=' + i.getId() + 'IM><td>' + selectIcon(i.getType()) + "  " + i.getName() + '</td><td>' + i.getValue() + '</td><td>' + i.getInvCount() + '</td><td>' + total + '</td><td><button class="myBtn" id="jInvDrop" onclick="javascript:jInvDrop(' + i.getId() + ')">Drop</button></td></tr>');
+        }
+    }
+    const resetJInvMenu = () => {
+        $("#invTable").empty();
     }
 
     const setQuantity = (upordown, id, cost) => {
@@ -205,7 +242,7 @@ const Graphics = () => {
         if (currentPage == state.getPages().length - 1) {
             removeAction("next");
             addAction("endConvo", "Goodbye");
-        } 
+        }
         if (currentPage == 1) {
             addAction("prev", "Previous");
             removeAction("next");
@@ -223,7 +260,7 @@ const Graphics = () => {
         }
         if (currentPage == 0) {
             removeAction("prev");
-        } 
+        }
         if (currentPage == state.getPages().length - 2) {
             removeAction("endConvo");
             addAction("next", "Next");
@@ -275,10 +312,12 @@ const Graphics = () => {
         }
     }
 
+
+
     const loadShop = (room) => { //Handles loading a shops graphics
         //check if room has attached shop
         if (!room.isShop()) {
-            console.warn("Warning: Cannot load room as a shop. It is not a shop");
+            warning("Warning: Cannot load room as a shop. It is not a shop");
             return false;
         }
         //select shop div
@@ -308,18 +347,9 @@ const Graphics = () => {
         if (exitMsg !== null) {
             addText(exitMsg);
         }
-        //Add Room Desc
-        if (!room.getHasSeen() && room.getInitDesc() !== null) {
-            addText(room.getInitDesc());
-        } else {
-            addText(room.getDesc());
-        }
-        //Add Takeable items to description
-        if (room.getTakeableItems() != null && room.getTakeableItems().length > 0) {
-            for (let i of room.getTakeableItems()) {
-                addText('\n <span class="inTextBox" id="' + i.getId() + 'inRoom">' + i.getInRoomDesc() + "</span>");
-            }
-        }
+
+        //Add room information
+        getRoomInfo(room);
 
         //Set Exits
         for (let e of room.getExits()) {
@@ -353,6 +383,8 @@ const Graphics = () => {
                 updateInvColItem(data[0].getItem(), data[0].getCount(), data[1]);
             } else if (op === "removeInv") {
                 removeFromInvCol(data);
+                resetJInvMenu();
+                loadJInvMenu();
             } else if (op === "mode") {
                 changeMode(data);
             } else if (op === "load_page") {
@@ -379,9 +411,12 @@ const Graphics = () => {
                     toggleTalk(data);
             } else if (op === "refresh_textArea") {
                 refreshActions(data);
-                //TODO Add refresh text
+                flushTextArea();
+                getRoomInfo(data);
             } else if (op === "toggle_textArea") {
                 resizeTextArea();
+            } else if (op === "add_text") {
+                addText(data);
             }
 
             //}

@@ -325,6 +325,14 @@ li a:hover, li a.selected {
 }
 
 /********** Popovers ***********/
+/*
+.popover-content{
+	background-color: rgba(0, 0, 0, 0.3);
+}
+.popover-title{
+	background-color: rgba(0, 0, 0, 0.3);
+}
+*/
 /********** Buttons ***********/
 .btn-custom { 
 	 margin: 10px;

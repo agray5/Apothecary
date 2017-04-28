@@ -42,7 +42,7 @@
                  return true;
              }
          }
-         console.warn("Warning: item: " + item + " could not be subtracted from actor's inventory. item: " + item + " does not exsist in actor's inventory.");
+         warning("Warning: item: " + item + " could not be subtracted from actor's inventory. item: " + item + " does not exsist in actor's inventory.");
          return false;
      }
 
@@ -87,7 +87,7 @@
          setMunny: (amount = 0) => {
              munny = amount;
          },
-         setCurrentRoom: (room = currentRoom) => {
+         setRoom: (room = currentRoom) => {
              currentRoom = room;
          },
          setState: (state_) => {
@@ -101,7 +101,7 @@
          },
          drop: (item = null) => {
              if (item === null) {
-                 console.warn("Warning: cannot drop item. It is null");
+                 warning("Warning: cannot drop item. It is null");
                  return false;
              }
              subFromInv(item);
@@ -120,7 +120,7 @@
                  //refreshActions(currentRoom);
                  //lookAround(currentRoom);
              } else {
-                 console.warn("Warning: The item is not in the actors current room");
+                 warning("Warning: The item is not in the actors current room");
              }
          }
 
@@ -146,15 +146,26 @@
                  return i;
              }
          }
-         console.warn("Warning: Could not find a inventory mapping with that item.");
+         warning("Warning: Could not find a inventory mapping with that item.");
+         return false;
+     }
+
+     const findInvItemFromId = (id) => {
+         for (let i of inventory) {
+             if (i.getId() === id) {
+                 return i;
+             }
+         }
+         warning("Warning: Could not find a inventory mapping with that item id.");
          return false;
      }
 
      const addToInv = (item, amount = 1) => {
+         console.log(item);
          //Check if item is a equipment or an ingredient 
-         if (item.getType() == "equip") {
+         if (item.getType() === "equip") {
              equipment.push(item);
-         } else if (item.getType() == "ing") {
+         } else if (item.getType() === "ing") {
              ingChest.push(item);
          } else { //Everything else goes into normal inventory
              let isNew = false;
@@ -177,12 +188,12 @@
                  }
              }
              gcon.update("updateInv", [invMap, isNew]);
-             //updateInvColItem(item, invMap.getCount(), isNew);
          }
      }
 
      const subFromInv = (item, amount = 1) => {
-
+        let invMap = item;
+        item = item.getItem();
          if (item.getType() == "equip") {
              equipment.splice(equipment.indexOf(item), 1);
              if (equipped.indexOf(item) != -1) {
@@ -191,21 +202,13 @@
          } else if (item.getType() == "ing") {
              ingChest.splice(ingChest.indexOf(item), 1);
          } else {
-             let i = findInvItem(item);
-             if (inventory.indexOf(i) !== -1) { //Item is in inventory
-                 i.remove(amount);
-                 if (i.getCount() <= 0) { //There are no more of this item after it has been removed
-                     inventory.splice(inventory.indexOf(i), 1);
-                     gcon.update("removeInv", item);
-                     //removeFromInvCol(item);
-                 } else {
-                     gcon.update("updateInv", [invMap]);
-                     //updateInvColItem(item, i.getCount()); //Update inventory text
-                 }
-                 return true;
+             invMap.remove(amount);
+             if (invMap.getCount() <= 0) { //There are no more of this item after it has been removed
+                 inventory.splice(inventory.indexOf(invMap), 1);
+                 gcon.update("removeInv", item);
+             } else {
+                 gcon.update("updateInv", [invMap]);
              }
-             console.warn("Warning: item: " + item.getName() + " could not be subtracted from players's inventory. item: " + item.getName() + " does not exist in player's inventory.");
-             return false;
          }
      }
 
@@ -217,6 +220,7 @@
          findInvItem,
          addToInv,
          subFromInv,
+         findInvItemFromId,
          getName: () => {
              return name;
          },
@@ -243,7 +247,7 @@
          },
          getItemCount: (item = null) => {
              if (item === null) { //Do not check item count if item is null
-                 console.warn("Warning: cannot get item count. Item is null");
+                 warning("Warning: cannot get item count. Item is null");
                  return false;
              }
              for (let i of inventory) {
@@ -251,7 +255,7 @@
                      return i.getCount();
                  }
              }
-             console.warn("Warning: player does not have item " + item + " in their inventory");
+             warning("Warning: player does not have item " + item + " in their inventory");
          },
          isOutside: () => {
              return isOutside;
@@ -272,12 +276,12 @@
          setEquipped: (equip = []) => {
              equipped = equip;
          },
-         setCurrentRoom: (room = currentRoom) => {
+         setRoom: (room = currentRoom) => {
              currentRoom = room;
          },
          startInteraction: (actor = null, action = null) => { //Player interaction with NPC 
              if (actor === null || action === null) {
-                 console.warn("Warning: player cannot start interaction. Both actor and action must be specified.");
+                 warning("Warning: player cannot start interaction. Both actor and action must be specified.");
                  return false;
              } else {
                  interactingWith = actor;
@@ -288,17 +292,17 @@
                          interaction = "talking";
                          break;
                      default:
-                         console.warn("Warning: cannot start interaction. " + action + " does not exist.");
+                         warning("Warning: cannot start interaction. " + action + " does not exist.");
                          return false;
                  }
              }
          },
          stopInteraction: () => { //Stop player interaction with NPC
-             if(interaction == "talking"){
-                setTalking(false);
+             if (interaction == "talking") {
+                 setTalking(false);
              }
              interactingWith = null;
-             interaction = null;    
+             interaction = null;
          },
          addMunny: (amount = 1) => {
              munny += amount;
@@ -308,14 +312,11 @@
          },
          drop: (item = null) => {
              if (item === null) {
-                 console.warn("Warning: cannot drop item. It is null");
+                 warning("Warning: cannot drop item. It is null");
                  return false;
              }
              subFromInv(item);
-             currentRoom.addToTakableItems(item);
-             gcon.update("refresh_textArea");
-             //refreshActions(currentRoom);
-             //lookAround(currentRoom);
+             currentRoom.addToTakeableItems(item.getItem());
          },
          take: (item) => {
              let index = currentRoom.getTakeableItems().indexOf(item);
@@ -327,12 +328,12 @@
                  //refreshActions(currentRoom);
                  //lookAround(currentRoom);
              } else {
-                 console.warn("Warning: The item is not in the actors current room");
+                 warning("Warning: The item is not in the actors current room");
              }
          },
          unequip: (item = null) => {
              if (item == null) {
-                 console.warn("Warning: Cannot unequip item. It is " + item);
+                 warning("Warning: Cannot unequip item. It is " + item);
                  return false; //Do not continue if item is equal to null
              }
 
@@ -340,16 +341,16 @@
                  equipped.splice(equipped.indexOf(item), 1); //Remove item from list of equipped items
                  return true;
              }
-             console.warn("Warning: ", item, " is not currently equipped.");
+             warning("Warning: ", item, " is not currently equipped.");
          },
          equip: (item = null) => {
              if (item == null) {
-                 console.warn("Warning: Cannot equip item. It is " + item);
+                 warning("Warning: Cannot equip item. It is " + item);
                  return false; //Do not continue if item is equal to null
              }
 
              if (equipped.indexOf(item) != -1) { //Item is currently equipped
-                 console.warn("Warning: cannot equip. " + item + " is already equipped.");
+                 warning("Warning: cannot equip. " + item + " is already equipped.");
                  return false;
              }
              equipped.push(item); //place item in list of equipped items
@@ -359,7 +360,9 @@
 
 
 
- const State = (pages = state = () => {return ["Error: this is a blank page. This state has no pages in it."]}, vals = null) => {
+ const State = (pages = state = () => {
+     return ["Error: this is a blank page. This state has no pages in it."]
+ }, vals = null) => {
      let currentPage = 0;
 
      const update = () => {
@@ -386,7 +389,7 @@
                  currentPage++;
                  return true;
              }
-             console.warn("Warning: cannot go to the next page. It is the last page in the state.");
+             warning("Warning: cannot go to the next page. It is the last page in the state.");
              return false;
          },
          pagePev: () => {
@@ -394,34 +397,34 @@
                  currentPage--;
                  return true;
              }
-             console.warn("Warning: cannot go to the previous page. It is the first page in the state.");
+             warning("Warning: cannot go to the previous page. It is the first page in the state.");
              return false;
          }
      }
  };
 
  const fillInFun = (vals, state) => {
-         switch (vals.length) {
-             case 0:
-                 return;
-                 break;
-             case 1:
-                 return state(eval(vals[0]));
-                 break;
-             case 2:
-                 return state(eval(vals[0]), eval(vals[1]));
-                 break;
-             case 3:
-                 return state(eval(vals[0]), eval(vals[1]), eval(vals[2]));
-                 break;
-             case 4:
-                 return state(eval(vals[0]), eval(vals[1]), eval(vals[2]));
-                 break;
-             case 5:
-                 return state(eval(vals[0]), eval(vals[1]), eval(vals[2]), eval(vals[3]));
-                 break;
-             default:
-                 console.warn("Warning: cannot fill in state.", vals.length, "values is not supported.");
-         }
+     switch (vals.length) {
+         case 0:
+             return;
+             break;
+         case 1:
+             return state(eval(vals[0]));
+             break;
+         case 2:
+             return state(eval(vals[0]), eval(vals[1]));
+             break;
+         case 3:
+             return state(eval(vals[0]), eval(vals[1]), eval(vals[2]));
+             break;
+         case 4:
+             return state(eval(vals[0]), eval(vals[1]), eval(vals[2]));
+             break;
+         case 5:
+             return state(eval(vals[0]), eval(vals[1]), eval(vals[2]), eval(vals[3]));
+             break;
+         default:
+             warning("Warning: cannot fill in state.", vals.length, "values is not supported.");
+     }
 
  }

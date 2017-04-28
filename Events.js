@@ -47,9 +47,10 @@ const Events = (player, gcon) => {
     /* Take.Item Click */
     $(".action").on("click", "li.takeable", function (event) {
         takeTurn();
-        for (let i of player.getRoom().getTakeableItems()) {
-            if (player.findInvItem(i).getId(i) === this.getId()) {
-                takeItem(i);
+        let items = player.getRoom().getTakeableItems();
+        for (let i in items) {
+            if (items[i].getId() === parseInt($(this).attr('id'))) {
+                player.take(items[i]);
             }
         }
         if (player.getRoom().getTakeableItems().length === 0) {
@@ -89,16 +90,16 @@ const Events = (player, gcon) => {
     /* Exit Click */
     $(".exit").on("click", "li", function (event) {
         if (!player.isTalking()) {
-            for (let e of player.getCurrentRoom().getExits()) {
-                if (e.getDir() === this.getId()) {
+            for (let e of player.getRoom().getExits()) {
+                if (e.getDir() === this.id) {
                     if (e.getNextRoom() == null) {
-                        throw new Error("Error: cannot go direction: " + e.getDir() + ". The next room is null");
+                        warning("Warning: cannot go direction: " + e.getDir() + ". The next room is null");
                     } else {
-                        player.setCurrentRoom(e.getNextRoom());
+                        player.setRoom(e.getNextRoom());
                         if (e.getExitMsg() != null)
-                            changeRoom(e);
+                            changeRoom(e.getNextRoom(), e.getExitMsg());
                         else
-                            changeRoom();
+                            changeRoom(e.getNextRoom());
                     }
                 }
             }
@@ -134,13 +135,4 @@ const Events = (player, gcon) => {
         $("#roam").toggle();
     });
 
-    /* ToolTip Examine Click */
-    const examine = (item) => {
-        for (let i of player.getInventory()) {
-            if (i.getId() == item) {
-                addText("You remove the " + i.getName() + " from your bag and examine it. " + i.getDesc());
-                scrollText();
-            }
-        }
-    }
 }
